@@ -5,5 +5,10 @@ export const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./features/auth/auth-module').then(m => m.AuthModule)
+  },
+  // Tu nueva ruta
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./features/dashboard/dashboard-page/dashboard-page').then(m => m.DashboardPage)
   }
 ];
