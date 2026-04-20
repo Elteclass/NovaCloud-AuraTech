@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // 1. Agrega ReactiveFormsModule aquí
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -37,9 +37,12 @@ export class Login {
 
     this.isLoading = true;
     
-    // Se simula latencia de red de 1.5 segundos
     setTimeout(() => {
       this.isLoading = false;
+      
+      // Se guarda un token falso en el navegador para simular una sesión activa
+      localStorage.setItem('auratech_token', 'mock-jwt-token-12345');
+      
       // Se navega al dashboard
       this.router.navigate(['/dashboard']); 
     }, 1500);
