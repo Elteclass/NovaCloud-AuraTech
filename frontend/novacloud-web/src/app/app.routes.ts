@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth-guard';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -6,9 +8,9 @@ export const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./features/auth/auth-module').then(m => m.AuthModule)
   },
-  // Tu nueva ruta
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard-page/dashboard-page').then(m => m.DashboardPage)
+  { 
+    path: 'dashboard', 
+    loadComponent: () => import('./features/dashboard/dashboard-page/dashboard-page').then(c => c.DashboardPage),
+    canActivate: [authGuard]
   }
 ];
