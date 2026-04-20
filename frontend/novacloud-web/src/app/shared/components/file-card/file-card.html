@@ -1,0 +1,21 @@
+<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
+  <div class="flex items-center gap-4">
+    
+    <div class="p-3 rounded-lg flex-shrink-0"
+         [ngClass]="file.type === 'pdf' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'">
+      <span class="font-bold text-xs uppercase">{{ file.type }}</span>
+    </div>
+    
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-semibold text-gray-900 truncate" [title]="file.name">
+        {{ file.name }}
+      </p>
+      <div class="flex items-center text-xs text-gray-500 mt-1">
+        <span>{{ file.size }}</span>
+        <span class="mx-2">•</span>
+        <span>{{ file.uploadDate | date:'mediumDate' }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>
