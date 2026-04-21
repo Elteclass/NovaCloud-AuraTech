@@ -32,6 +32,14 @@ devnotes.md
 **/*.tmp
 **/*.temp
 
+# Local-only config overrides
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/*secrets*.json
+**/.env
+**/.env.*
+!**/.env.example
+
 # NuGet packages cache (if restored locally inside repo)
 **/packages/
 
