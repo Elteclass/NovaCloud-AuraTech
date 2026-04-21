@@ -1,0 +1,49 @@
+# Local notes file
+devnotes.md
+
+# Build outputs
+**/bin/
+**/obj/
+
+# User-specific files
+**/*.user
+**/*.rsuser
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# IDE/editor folders
+.vs/
+.vscode/
+
+# Test and coverage artifacts
+**/TestResults/
+**/*.trx
+**/*.coverage
+**/*.coveragexml
+**/coverage/
+
+# Publish output
+**/publish/
+
+# Logs and temp files
+**/*.log
+**/logs/
+**/*.tmp
+**/*.temp
+
+# Local-only config overrides
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/*secrets*.json
+**/.env
+**/.env.*
+!**/.env.example
+
+# NuGet packages cache (if restored locally inside repo)
+**/packages/
+
+# Rider/ReSharper
+**/.idea/
+**/_ReSharper*/
+**/*.DotSettings.user

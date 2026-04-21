@@ -1,0 +1,6 @@
+@NovaCloud.BackendCore_HostAddress = http://localhost:5224
+
+GET {{NovaCloud.BackendCore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
