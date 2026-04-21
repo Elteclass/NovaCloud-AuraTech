@@ -1,34 +1,50 @@
-<div class="flex items-center justify-between w-full h-full">
-  
-  <div class="flex-1 max-w-md">
-    <div class="relative">
-      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
-      <input type="text" class="block w-full px-4 py-2 pl-10 text-sm text-slate-700 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-accent focus:border-brand-accent outline-none transition-all" placeholder="Buscar documentos, carpetas...">
+<!-- Topbar: NovaCloud Dashboard -->
+<div class="flex items-center justify-between w-full h-full px-6">
+
+  <!-- Logo -->
+  <div class="flex items-center gap-3 text-primary">
+    <div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+      <span class="material-symbols-outlined">cloud</span>
     </div>
+    <h2 class="text-slate-900 text-xl font-bold leading-tight tracking-tight">NovaCloud</h2>
   </div>
 
-  <div class="flex items-center gap-4 ml-4">
-    
-    <button type="button" class="p-2 text-slate-400 rounded-lg hover:text-brand-primary hover:bg-slate-50 relative transition-colors">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-      </svg>
-      <span class="absolute top-1 right-1 flex h-3 w-3">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-accent"></span>
-      </span>
+  <!-- Search Bar -->
+  <div class="flex flex-1 justify-center max-w-2xl px-8">
+    <label class="flex flex-col w-full h-10">
+      <div class="flex w-full flex-1 items-stretch rounded-lg bg-slate-100 border border-transparent focus-within:border-primary transition-all">
+        <div class="text-slate-500 flex items-center justify-center pl-4">
+          <span class="material-symbols-outlined text-xl">search</span>
+        </div>
+        <input
+          class="flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-slate-900 placeholder:text-slate-500 text-sm font-normal outline-none px-3"
+          placeholder="Buscar archivos, carpetas o documentos..."
+          type="text">
+      </div>
+    </label>
+  </div>
+
+  <!-- Right Actions & Profile -->
+  <div class="flex items-center gap-4">
+    <!-- Notifications -->
+    <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors relative">
+      <span class="material-symbols-outlined">notifications</span>
+      @if (notificationCount > 0) {
+        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+          {{ notificationCount }}
+        </span>
+      }
     </button>
 
-    <div class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-1.5 rounded-lg transition-colors border border-transparent hover:border-slate-100">
-      <div class="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-sm shadow-md">
-        AD
+    <!-- Profile Chip -->
+    <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+      <div class="text-right hidden sm:block">
+        <p class="text-sm font-bold leading-none">{{ user.fullName }}</p>
+        <p class="text-xs text-slate-500 mt-1">{{ user.role }}</p>
       </div>
-      <span class="hidden md:block text-sm font-semibold text-slate-700">Admin AuraTech</span>
+      <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
+           [style.background-image]="'url(' + user.avatarUrl + ')'">
+      </div>
     </div>
-
   </div>
 </div>
