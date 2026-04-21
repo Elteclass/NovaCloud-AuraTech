@@ -1,21 +1,9 @@
-<div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
-  <div class="flex items-center gap-4">
-    
-    <div class="p-3 rounded-lg flex-shrink-0"
-         [ngClass]="file.type === 'pdf' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'">
-      <span class="font-bold text-xs uppercase">{{ file.type }}</span>
-    </div>
-    
-    <div class="flex-1 min-w-0">
-      <p class="text-sm font-semibold text-gray-900 truncate" [title]="file.name">
-        {{ file.name }}
-      </p>
-      <div class="flex items-center text-xs text-gray-500 mt-1">
-        <span>{{ file.size }}</span>
-        <span class="mx-2">•</span>
-        <span>{{ file.uploadDate | date:'mediumDate' }}</span>
-      </div>
-    </div>
-
+<!-- File Card Component -->
+<div class="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-shadow cursor-pointer group">
+  <div class="aspect-square bg-slate-50 rounded-lg flex items-center justify-center mb-3 relative overflow-hidden">
+    <span class="material-symbols-outlined text-5xl" [ngClass]="iconColorClass">{{ fileIcon }}</span>
+    <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
   </div>
+  <p class="text-sm font-semibold truncate text-slate-900" [title]="file.name">{{ file.name }}</p>
+  <p class="text-[10px] text-slate-500 mt-1">{{ file.timeAgo || (file.uploadDate | date:'mediumDate') }}</p>
 </div>

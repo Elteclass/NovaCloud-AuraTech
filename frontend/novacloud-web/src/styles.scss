@@ -2,4 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Utilidades globales personalizadas*/
+/* Material Symbols base settings */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Global body font */
+body {
+  font-family: 'Inter', sans-serif;
+}

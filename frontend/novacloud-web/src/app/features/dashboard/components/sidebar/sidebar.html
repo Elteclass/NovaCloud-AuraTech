@@ -1,38 +1,46 @@
+<!-- Sidebar: NovaCloud Dashboard -->
 <div class="flex flex-col h-full w-full bg-white text-slate-800">
-  <div class="h-16 flex items-center px-6 border-b border-slate-100">
-    <div class="flex items-center gap-2">
-      <svg class="w-8 h-8 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-      </svg>
-      <span class="text-xl font-bold tracking-tight text-brand-primary">NovaCloud</span>
-    </div>
+
+  <!-- Action Buttons -->
+  <div class="p-4 space-y-2">
+    <button class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 transition-all">
+      <span class="material-symbols-outlined">add_circle</span>
+      Subir Nuevo Archivo
+    </button>
+    <button class="w-full flex items-center justify-center gap-2 bg-slate-100 text-primary py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">
+      <span class="material-symbols-outlined">create_new_folder</span>
+      Nueva Carpeta
+    </button>
   </div>
 
-  <nav class="flex-1 py-4 px-3 space-y-2 overflow-y-auto">
-    <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-slate-50 text-brand-primary rounded-lg font-semibold transition-colors border border-slate-100 shadow-sm">
-      <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-      </svg>
-      Mis Documentos
-    </a>
+  <!-- Navigation Menu -->
+  <nav class="flex-1 px-4 py-2 overflow-y-auto">
+    <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Principal</p>
 
-    <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-brand-primary rounded-lg font-medium transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-      </svg>
-      Equipos
-    </a>
-
-    <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:bg-slate-50 hover:text-brand-primary rounded-lg font-medium transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-      </svg>
-      Ajustes
-    </a>
+    @for (item of navItems; track item.label) {
+      <a href="#"
+         [class]="item.active
+           ? 'flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-semibold mb-1'
+           : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors mb-1'">
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+        <span class="text-sm">{{ item.label }}</span>
+      </a>
+    }
   </nav>
 
-  <div class="p-4 border-t border-slate-100 text-xs text-slate-400 text-center font-medium">
-    NovaCloud SaaS v1.0
+  <!-- Storage Bar -->
+  <div class="p-4">
+    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-medium text-slate-500">Almacenamiento</span>
+        <span class="text-xs font-bold text-primary">{{ storage.percentage }}%</span>
+      </div>
+      <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+        <div class="bg-primary h-full rounded-full transition-all" [style.width.%]="storage.percentage"></div>
+      </div>
+      <p class="text-[10px] text-slate-400 mt-2 text-center">
+        {{ storage.usedGB }} GB de {{ storage.totalGB }} GB utilizados
+      </p>
+    </div>
   </div>
 </div>
