@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "/HepPc4fw6c=",
+  "dgSpecHash": "G7pNLFiEDIY=",
   "success": true,
   "projectFilePath": "C:\\Users\\T5809\\NovaCloud-AuraTech\\backend-core\\NovaCloud.BackendCore\\NovaCloud.BackendCore.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\T5809\\.nuget\\packages\\awssdk.cognitoidentityprovider\\4.0.7\\awssdk.cognitoidentityprovider.4.0.7.nupkg.sha512",
     "C:\\Users\\T5809\\.nuget\\packages\\awssdk.core\\4.0.3.29\\awssdk.core.4.0.3.29.nupkg.sha512",
     "C:\\Users\\T5809\\.nuget\\packages\\awssdk.s3\\4.0.21.2\\awssdk.s3.4.0.21.2.nupkg.sha512",
     "C:\\Users\\T5809\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.5\\microsoft.aspnetcore.openapi.10.0.5.nupkg.sha512",

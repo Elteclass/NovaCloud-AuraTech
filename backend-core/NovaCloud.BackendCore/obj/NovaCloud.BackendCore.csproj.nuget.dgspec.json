@@ -51,6 +51,10 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "AWSSDK.CognitoIdentityProvider": {
+              "target": "Package",
+              "version": "[4.0.7, )"
+            },
             "AWSSDK.S3": {
               "target": "Package",
               "version": "[4.0.21.2, )"

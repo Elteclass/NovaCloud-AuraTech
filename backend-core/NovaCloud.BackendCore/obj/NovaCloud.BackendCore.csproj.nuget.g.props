@@ -16,5 +16,6 @@
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\T5809\.nuget\packages\awssdk.core\4.0.3.29</PkgAWSSDK_Core>
     <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\T5809\.nuget\packages\awssdk.s3\4.0.21.2</PkgAWSSDK_S3>
+    <PkgAWSSDK_CognitoIdentityProvider Condition=" '$(PkgAWSSDK_CognitoIdentityProvider)' == '' ">C:\Users\T5809\.nuget\packages\awssdk.cognitoidentityprovider\4.0.7</PkgAWSSDK_CognitoIdentityProvider>
   </PropertyGroup>
 </Project>

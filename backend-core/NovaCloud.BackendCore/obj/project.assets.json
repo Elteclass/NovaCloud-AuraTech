@@ -2,6 +2,22 @@
   "version": 3,
   "targets": {
     "net10.0": {
+      "AWSSDK.CognitoIdentityProvider/4.0.7": {
+        "type": "package",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.3.29, 5.0.0)"
+        },
+        "compile": {
+          "lib/net8.0/AWSSDK.CognitoIdentityProvider.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/AWSSDK.CognitoIdentityProvider.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "AWSSDK.Core/4.0.3.29": {
         "type": "package",
         "compile": {
@@ -69,6 +85,31 @@
     }
   },
   "libraries": {
+    "AWSSDK.CognitoIdentityProvider/4.0.7": {
+      "sha512": "PopIGBY8BoT+JrFJgmbn6Gfek4NCdwAvJ+U0APw/e6b9kY7ot7ZzPqTBpnrV9SuGuSjAvu6IbNwXiflCNfbXuQ==",
+      "type": "package",
+      "path": "awssdk.cognitoidentityprovider/4.0.7",
+      "hasTools": true,
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "analyzers/dotnet/cs/AWSSDK.CognitoIdentityProvider.CodeAnalysis.dll",
+        "analyzers/dotnet/cs/SharedAnalysisCode.dll",
+        "awssdk.cognitoidentityprovider.4.0.7.nupkg.sha512",
+        "awssdk.cognitoidentityprovider.nuspec",
+        "images/AWSLogo.png",
+        "lib/net472/AWSSDK.CognitoIdentityProvider.dll",
+        "lib/net472/AWSSDK.CognitoIdentityProvider.xml",
+        "lib/net8.0/AWSSDK.CognitoIdentityProvider.dll",
+        "lib/net8.0/AWSSDK.CognitoIdentityProvider.xml",
+        "lib/netcoreapp3.1/AWSSDK.CognitoIdentityProvider.dll",
+        "lib/netcoreapp3.1/AWSSDK.CognitoIdentityProvider.xml",
+        "lib/netstandard2.0/AWSSDK.CognitoIdentityProvider.dll",
+        "lib/netstandard2.0/AWSSDK.CognitoIdentityProvider.xml",
+        "tools/install.ps1",
+        "tools/uninstall.ps1"
+      ]
+    },
     "AWSSDK.Core/4.0.3.29": {
       "sha512": "y07n9BHBVRDe3fDAjitnOBPwDwJ5NZ4oOh6ZvOizYWEsJnYcs34FQtTJ70Gt17qTCH86ma5kJdyMZ2lixm/dqg==",
       "type": "package",
@@ -155,6 +196,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "AWSSDK.CognitoIdentityProvider >= 4.0.7",
       "AWSSDK.S3 >= 4.0.21.2",
       "Microsoft.AspNetCore.OpenApi >= 10.0.5"
     ]
@@ -210,6 +252,10 @@
       "net10.0": {
         "targetAlias": "net10.0",
         "dependencies": {
+          "AWSSDK.CognitoIdentityProvider": {
+            "target": "Package",
+            "version": "[4.0.7, )"
+          },
           "AWSSDK.S3": {
             "target": "Package",
             "version": "[4.0.21.2, )"
