@@ -18,8 +18,10 @@
     <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Principal</p>
 
     @for (item of navItems; track item.label) {
-      <a href="#"
-         [class]="item.active
+      <a [routerLink]="item.route"
+         routerLinkActive="is-active"
+         #rla="routerLinkActive"
+         [class]="rla.isActive
            ? 'flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-semibold mb-1'
            : 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors mb-1'">
         <span class="material-symbols-outlined">{{ item.icon }}</span>

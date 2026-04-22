@@ -2,12 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CloudFile, CloudFolder } from '../../../core/models/cloud-file.model';
 import { FileCard } from '../../../shared/components/file-card/file-card';
-import { Sidebar } from '../components/sidebar/sidebar';
-import { Topbar } from '../components/topbar/topbar';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [CommonModule, FileCard, Sidebar, Topbar],
+  imports: [CommonModule, FileCard],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
 })
