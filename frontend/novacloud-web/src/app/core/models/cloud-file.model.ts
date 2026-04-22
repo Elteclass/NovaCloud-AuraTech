@@ -29,7 +29,7 @@ export interface StorageInfo {
 export interface NavItem {
   label: string;
   icon: string;   // Material Symbols icon name
-  active: boolean;
+  active?: boolean;
   route?: string;
 }
 
