@@ -10,6 +10,29 @@ import { FileCard } from '../../../shared/components/file-card/file-card';
   styleUrl: './dashboard-page.scss'
 })
 export class DashboardPage {
+  viewMode: 'grid' | 'list' = 'grid';
+
+  availableTags: string[] = ['#Estrategia', '#Confidencial', '#Borrador', '#Finanzas', '#Aprobado', '#Urgente'];
+  selectedTag: string | null = null;
+
+  toggleViewMode(mode: 'grid' | 'list') {
+    this.viewMode = mode;
+  }
+
+  toggleTag(tag: string) {
+    if (this.selectedTag === tag) {
+      this.selectedTag = null;
+    } else {
+      this.selectedTag = tag;
+    }
+  }
+
+  get filteredFiles(): CloudFile[] {
+    if (!this.selectedTag) {
+      return this.files;
+    }
+    return this.files.filter(f => f.tags && f.tags.includes(this.selectedTag!));
+  }
 
   // ── Mock: Carpetas Generales ──
   folders: CloudFolder[] = [
@@ -54,11 +77,11 @@ export class DashboardPage {
 
   // ── Mock: Archivos Generales ──
   files: CloudFile[] = [
-    { name: 'Manual_Usuario_v2.pdf',    size: '2.5 MB', type: 'pdf',  uploadDate: new Date('2026-01-15'), timeAgo: 'Hace 3 meses' },
-    { name: 'Especificaciones_UI.docx', size: '1.2 MB', type: 'doc',  uploadDate: new Date('2026-02-10'), timeAgo: 'Hace 2 meses' },
-    { name: 'Reporte_Anual_2025.pdf',   size: '4.8 MB', type: 'pdf',  uploadDate: new Date('2026-03-01'), timeAgo: 'Hace 1 mes' },
-    { name: 'Presupuesto_Nova.xlsx',    size: '3.1 MB', type: 'xlsx', uploadDate: new Date('2026-03-20'), timeAgo: 'Hace 3 semanas' },
-    { name: 'Logo_AuraTech.jpg',        size: '8.2 MB', type: 'jpg',  uploadDate: new Date('2026-04-05'), timeAgo: 'Hace 2 semanas' },
-    { name: 'Minuta_Reunion.pdf',       size: '1.5 MB', type: 'pdf',  uploadDate: new Date('2026-04-15'), timeAgo: 'Hace 6 días' },
+    { name: 'Manual_Usuario_v2.pdf',    size: '2.5 MB', type: 'pdf',  uploadDate: new Date('2026-01-15'), timeAgo: 'Hace 3 meses', owner: 'Ana Torres', tags: ['#Confidencial', '#Borrador'] },
+    { name: 'Especificaciones_UI.docx', size: '1.2 MB', type: 'doc',  uploadDate: new Date('2026-02-10'), timeAgo: 'Hace 2 meses', owner: 'Luis Mendoza', tags: ['#Estrategia'] },
+    { name: 'Reporte_Anual_2025.pdf',   size: '4.8 MB', type: 'pdf',  uploadDate: new Date('2026-03-01'), timeAgo: 'Hace 1 mes', owner: 'Carlos Ruiz', tags: ['#Finanzas', '#Aprobado'] },
+    { name: 'Presupuesto_Nova.xlsx',    size: '3.1 MB', type: 'xlsx', uploadDate: new Date('2026-03-20'), timeAgo: 'Hace 3 semanas', owner: 'Ana Torres', tags: ['#Finanzas', '#Confidencial'] },
+    { name: 'Logo_AuraTech.jpg',        size: '8.2 MB', type: 'jpg',  uploadDate: new Date('2026-04-05'), timeAgo: 'Hace 2 semanas', owner: 'Marketing Team', tags: ['#Aprobado'] },
+    { name: 'Minuta_Reunion.pdf',       size: '1.5 MB', type: 'pdf',  uploadDate: new Date('2026-04-15'), timeAgo: 'Hace 6 días', owner: 'Luis Mendoza', tags: ['#Urgente'] },
   ];
 }
