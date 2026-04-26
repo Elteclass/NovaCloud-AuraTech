@@ -7,6 +7,8 @@ export interface CloudFile {
   uploadDate: Date;
   /** Relative time label for display, e.g. "Hace 2 horas" */
   timeAgo?: string;
+  owner?: string;
+  tags?: string[];
 }
 
 export interface CloudFolder {
