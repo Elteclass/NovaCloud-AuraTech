@@ -90,7 +90,7 @@
           </thead>
           <tbody>
             @for (file of filteredFiles; track file.name) {
-              <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors group cursor-pointer">
+              <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors group cursor-pointer" (click)="openPreview(file)">
                 <td class="py-3 px-6">
                   <div class="flex items-center gap-3">
                     <div class="p-2 rounded-lg" [ngClass]="{

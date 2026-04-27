@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CloudFile, CloudFolder } from '../../../core/models/cloud-file.model';
 import { FileCard } from '../../../shared/components/file-card/file-card';
+import { FilePreviewService } from '../../../core/services/file-preview.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -11,6 +12,12 @@ import { FileCard } from '../../../shared/components/file-card/file-card';
 })
 export class DashboardPage {
   viewMode: 'grid' | 'list' = 'grid';
+
+  constructor(private filePreviewService: FilePreviewService) {}
+
+  openPreview(file: CloudFile): void {
+    this.filePreviewService.open(file);
+  }
 
   availableTags: string[] = ['#Estrategia', '#Confidencial', '#Borrador', '#Finanzas', '#Aprobado', '#Urgente'];
   selectedTag: string | null = null;
