@@ -1,39 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CloudFile, CloudFolder } from '../../../core/models/cloud-file.model';
-import { FileCard } from '../../../shared/components/file-card/file-card';
+import { FileListViewComponent } from '../../../shared/components/file-list-view/file-list-view.component';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [CommonModule, FileCard],
+  imports: [CommonModule, FileListViewComponent],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
 })
 export class DashboardPage {
-  viewMode: 'grid' | 'list' = 'grid';
-
-  availableTags: string[] = ['#Estrategia', '#Confidencial', '#Borrador', '#Finanzas', '#Aprobado', '#Urgente'];
-  selectedTag: string | null = null;
-
-  toggleViewMode(mode: 'grid' | 'list') {
-    this.viewMode = mode;
-  }
-
-  toggleTag(tag: string) {
-    if (this.selectedTag === tag) {
-      this.selectedTag = null;
-    } else {
-      this.selectedTag = tag;
-    }
-  }
-
-  get filteredFiles(): CloudFile[] {
-    if (!this.selectedTag) {
-      return this.files;
-    }
-    return this.files.filter(f => f.tags && f.tags.includes(this.selectedTag!));
-  }
-
   // ── Mock: Carpetas Generales ──
   folders: CloudFolder[] = [
     {
@@ -77,7 +53,17 @@ export class DashboardPage {
 
   // ── Mock: Archivos Generales ──
   files: CloudFile[] = [
-    { name: 'Manual_Usuario_v2.pdf',    size: '2.5 MB', type: 'pdf',  uploadDate: new Date('2026-01-15'), timeAgo: 'Hace 3 meses', owner: 'Ana Torres', tags: ['#Confidencial', '#Borrador'] },
+    { 
+      name: 'Proyecto_Estrategia_2024.pdf', 
+      size: '4.2 MB', 
+      type: 'pdf',  
+      uploadDate: new Date('2026-01-15'), 
+      timeAgo: 'Hace 3 meses', 
+      owner: 'Ana Torres', 
+      tags: ['#Confidencial', '#Borrador'],
+      aiSummary: 'Este documento detalla la hoja de ruta estratégica para el despliegue de soluciones de IA generativa en la nube. Los puntos clave incluyen: optimización de costos mediante arquitectura serverless, protocolos de seguridad de datos multi-región y un cronograma de implementación de 6 meses con hitos trimestrales.',
+      aiTags: ['#Estrategia', '#IA-Generated', '#Confidencial']
+    },
     { name: 'Especificaciones_UI.docx', size: '1.2 MB', type: 'doc',  uploadDate: new Date('2026-02-10'), timeAgo: 'Hace 2 meses', owner: 'Luis Mendoza', tags: ['#Estrategia'] },
     { name: 'Reporte_Anual_2025.pdf',   size: '4.8 MB', type: 'pdf',  uploadDate: new Date('2026-03-01'), timeAgo: 'Hace 1 mes', owner: 'Carlos Ruiz', tags: ['#Finanzas', '#Aprobado'] },
     { name: 'Presupuesto_Nova.xlsx',    size: '3.1 MB', type: 'xlsx', uploadDate: new Date('2026-03-20'), timeAgo: 'Hace 3 semanas', owner: 'Ana Torres', tags: ['#Finanzas', '#Confidencial'] },

@@ -9,6 +9,8 @@ export interface CloudFile {
   timeAgo?: string;
   owner?: string;
   tags?: string[];
+  aiSummary?: string;
+  aiTags?: string[];
 }
 
 export interface CloudFolder {

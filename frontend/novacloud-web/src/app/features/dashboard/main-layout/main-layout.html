@@ -4,8 +4,14 @@
   <div class="flex flex-1">
     <app-sidebar class="w-64 border-r border-slate-200 bg-white flex-col sticky top-[52px] h-[calc(100vh-52px)] overflow-y-auto hidden md:flex"></app-sidebar>
 
-    <main class="flex-1 overflow-y-auto bg-background-light">
+    <main class="flex-1 overflow-y-auto bg-background-light relative">
       <router-outlet></router-outlet>
     </main>
   </div>
+
+  <!-- Global File Preview Modal -->
+  <app-file-preview-modal 
+    [file]="filePreviewService.selectedFile()" 
+    (close)="filePreviewService.close()">
+  </app-file-preview-modal>
 </div>
