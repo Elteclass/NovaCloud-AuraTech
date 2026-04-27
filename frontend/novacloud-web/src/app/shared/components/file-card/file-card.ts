@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CloudFile } from '../../../core/models/cloud-file.model';
+import { FilePreviewService } from '../../../core/services/file-preview.service';
 
 @Component({
   selector: 'app-file-card',
@@ -10,6 +11,12 @@ import { CloudFile } from '../../../core/models/cloud-file.model';
 })
 export class FileCard {
   @Input({ required: true }) file!: CloudFile;
+
+  constructor(private filePreviewService: FilePreviewService) {}
+
+  openPreview(): void {
+    this.filePreviewService.open(this.file);
+  }
 
   /** Returns the Material Symbols icon name based on file type */
   get fileIcon(): string {
