@@ -1,46 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CloudFile, CloudFolder } from '../../../core/models/cloud-file.model';
-import { FileCard } from '../../../shared/components/file-card/file-card';
-import { FilePreviewService } from '../../../core/services/file-preview.service';
+import { FileListViewComponent } from '../../../shared/components/file-list-view/file-list-view.component';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [CommonModule, FileCard],
+  imports: [CommonModule, FileListViewComponent],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
 })
 export class DashboardPage {
-  viewMode: 'grid' | 'list' = 'grid';
-
-  constructor(private filePreviewService: FilePreviewService) {}
-
-  openPreview(file: CloudFile): void {
-    this.filePreviewService.open(file);
-  }
-
-  availableTags: string[] = ['#Estrategia', '#Confidencial', '#Borrador', '#Finanzas', '#Aprobado', '#Urgente'];
-  selectedTag: string | null = null;
-
-  toggleViewMode(mode: 'grid' | 'list') {
-    this.viewMode = mode;
-  }
-
-  toggleTag(tag: string) {
-    if (this.selectedTag === tag) {
-      this.selectedTag = null;
-    } else {
-      this.selectedTag = tag;
-    }
-  }
-
-  get filteredFiles(): CloudFile[] {
-    if (!this.selectedTag) {
-      return this.files;
-    }
-    return this.files.filter(f => f.tags && f.tags.includes(this.selectedTag!));
-  }
-
   // ── Mock: Carpetas Generales ──
   folders: CloudFolder[] = [
     {
