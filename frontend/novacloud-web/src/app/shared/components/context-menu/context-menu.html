@@ -1,0 +1,25 @@
+@if (menuService.isOpen()) {
+  <div class="fixed z-[9999] w-48 bg-white rounded-xl shadow-2xl border border-slate-100 py-2 animate-in fade-in zoom-in duration-150"
+       [style.top.px]="menuService.position().y"
+       [style.left.px]="menuService.position().x"
+       (click)="$event.stopPropagation()"> <button (click)="handleAction('Destacar')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+      <span class="material-symbols-outlined text-[18px]">star</span>
+      Destacar
+    </button>
+    
+    <button (click)="handleAction('Renombrar')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+      <span class="material-symbols-outlined text-[18px]">edit</span>
+      Renombrar
+    </button>
+    
+    <button (click)="handleAction('Descargar')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
+      <span class="material-symbols-outlined text-[18px]">download</span>
+      Descargar
+    </button>
+
+    <div class="h-px bg-slate-100 my-1 w-full"></div> <button (click)="handleAction('Mover a papelera')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium">
+      <span class="material-symbols-outlined text-[18px]">delete</span>
+      Mover a papelera
+    </button>
+  </div>
+}
