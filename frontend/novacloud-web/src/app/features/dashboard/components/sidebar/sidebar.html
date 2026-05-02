@@ -3,10 +3,10 @@
 
   <!-- Action Buttons -->
   <div class="p-4 space-y-2">
-    <button class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 transition-all">
+    <a routerLink="/carga" class="w-full flex items-center justify-center gap-2 bg-primary text-white py-3 rounded-xl font-bold text-sm hover:shadow-lg hover:shadow-primary/30 transition-all cursor-pointer">
       <span class="material-symbols-outlined">add_circle</span>
       Subir Nuevo Archivo
-    </button>
+    </a>
     <button (click)="openNewFolderModal()" class="w-full flex items-center justify-center gap-2 bg-slate-100 text-primary py-3 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all">
   <span class="material-symbols-outlined">create_new_folder</span>
   Nueva Carpeta

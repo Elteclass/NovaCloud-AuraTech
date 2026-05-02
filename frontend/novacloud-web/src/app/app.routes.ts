@@ -30,6 +30,11 @@ export const routes: Routes = [
       {
         path: 'papelera',
         loadComponent: () => import('./features/dashboard/trash-page/trash-page').then(c => c.TrashPage)
+      },
+      // --- Nueva Ruta del Centro de Carga ---
+      {
+        path: 'carga',
+        loadComponent: () => import('./features/dashboard/upload-page/upload-page').then(c => c.UploadPage)
       }
     ]
   }
