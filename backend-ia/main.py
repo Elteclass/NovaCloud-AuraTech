@@ -12,7 +12,7 @@ load_dotenv()
 
 APP_TITLE = "NovaCloud IA Microservice"
 APP_VERSION = "0.1.0"
-DEFAULT_MODEL = "gemini-1.5-flash"
+DEFAULT_MODEL = "gemini-2.5-flash"
 
 SYSTEM_INSTRUCTION = (
     "Eres un Analista Corporativo de AuraTech. "
