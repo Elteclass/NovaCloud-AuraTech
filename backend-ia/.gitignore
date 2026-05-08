@@ -24,3 +24,7 @@ pip-wheel-metadata/
 .coverage
 htmlcov/
 .cache/
+
+# Variables de entorno y secretos
+.env
+*.env

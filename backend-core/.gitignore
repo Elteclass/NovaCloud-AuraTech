@@ -47,3 +47,7 @@ devnotes.md
 **/.idea/
 **/_ReSharper*/
 **/*.DotSettings.user
+
+# Variables de entorno y secretos
+.env
+*.env
