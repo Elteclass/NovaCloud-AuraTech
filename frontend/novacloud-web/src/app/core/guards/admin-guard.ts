@@ -1,17 +1,21 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CanActivateFn, Router } from '@angular/router';
 
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  
-  // MOCK: Aquí iría la validación real con tu servicio de autenticación
-  const isAdmin = true; 
+  const platformId = inject(PLATFORM_ID);
 
-  if (isAdmin) {
-    return true;
-  } else {
-    // Si no es admin, lo pateamos de regreso a su unidad personal
-    router.navigate(['/dashboard']);
-    return false;
+  if (isPlatformBrowser(platformId)) {
+    // Validamos que exista un rol guardado y que sea explícitamente "admin"
+    const role = localStorage.getItem('auratech_role');
+    
+    if (role === 'admin') {
+      return true; // Es admin, pasa al dashboard naranja
+    }
   }
+
+  // Si no es admin, o es SSR, lo regresamos al dashboard de usuarios regulares
+  router.navigate(['/dashboard']);
+  return false;
 };

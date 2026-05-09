@@ -4,23 +4,20 @@ import { Router, CanActivateFn } from '@angular/router';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
-  const platformId = inject(PLATFORM_ID); // Inyectamos el contexto de la plataforma
+  const platformId = inject(PLATFORM_ID);
 
-  // Verificamos si el código se está ejecutando en un navegador real
+  // 1. Verificamos si estamos en el navegador
   if (isPlatformBrowser(platformId)) {
     
-    // Aquí adentro es 100% seguro usar localStorage
     const token = localStorage.getItem('auratech_token');
     
+    // Si el token existe, lo dejamos pasar
     if (token) {
-      return true; // Acceso concedido
-    } else {
-      router.navigate(['/login']); // Intruso detectado, de vuelta al login
-      return false;
+      return true; 
     }
   }
 
-  // Si se está ejecutando en el servidor (SSR), denegamos el acceso 
-  // temporalmente hasta que el navegador cargue por completo.
-  return true;
+  // 2. Si no hay token, o si es SSR, bloqueamos y lo mandamos al login
+  router.navigate(['/login']);
+  return false;
 };
