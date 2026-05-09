@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
+import { adminGuard } from './core/guards/admin-guard'; // Importamos el guard de administrador
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -7,12 +8,30 @@ export const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./features/auth/auth-module').then(m => m.AuthModule)
   },
-  // --- LAYOUT MAESTRO (Contiene las barras fijas) ---
+  
+  // ==========================================
+  // --- ENTORNO ADMINISTRADOR (Sin Sidebar) --
+  // ==========================================
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin-layout/admin-layout').then(c => c.AdminLayout),
+    canActivate: [adminGuard], // Protegemos todo el layout
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard').then(c => c.AdminDashboard)
+      }
+    ]
+  },
+
+  // ==========================================
+  // --- LAYOUT USUARIOS (Con Sidebar) --------
+  // ==========================================
   {
     path: '', 
-    loadComponent: () => import('./features/dashboard/main-layout/main-layout').then(c => c.MainLayout), // Revisa si el tuyo dice main-layout.component
-    canActivate: [authGuard],
-    // --- RUTAS HIJAS (Cambian en el centro de la pantalla) ---
+    loadComponent: () => import('./features/dashboard/main-layout/main-layout').then(c => c.MainLayout),
+    canActivate: [authGuard], // El usuario debe estar logueado
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -31,7 +50,6 @@ export const routes: Routes = [
         path: 'papelera',
         loadComponent: () => import('./features/dashboard/trash-page/trash-page').then(c => c.TrashPage)
       },
-      // --- Nueva Ruta del Centro de Carga ---
       {
         path: 'carga',
         loadComponent: () => import('./features/dashboard/upload-page/upload-page').then(c => c.UploadPage)
