@@ -38,13 +38,22 @@ export class Login {
     this.isLoading = true;
     
     setTimeout(() => {
-      this.isLoading = false;
-      
-      // Se guarda un token falso en el navegador para simular una sesión activa
-      localStorage.setItem('auratech_token', 'mock-jwt-token-12345');
-      
-      // Se navega al dashboard
-      this.router.navigate(['/dashboard']); 
+    this.isLoading = false;
+    const email = this.loginForm.value.email;
+    
+    // Guardamos el token de sesión
+    localStorage.setItem('auratech_token', 'mock-jwt-token-12345');
+    
+    // Lógica para diferenciar Admin de Usuario
+
+    if (email === 'admin@auratech.com') {
+      localStorage.setItem('auratech_role', 'admin'); // Guardamos el rol
+      this.router.navigate(['/admin/dashboard']);    // Redirigimos a la zona admin
+    } else {
+      localStorage.setItem('auratech_role', 'user');
+      this.router.navigate(['/dashboard']);          // Redirigimos a la zona usuario
+    }
     }, 1500);
   }
+
 }
