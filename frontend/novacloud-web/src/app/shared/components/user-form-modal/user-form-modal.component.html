@@ -1,0 +1,150 @@
+@if (visible) {
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+    (click)="onCancel()"
+  >
+    <!-- Panel — stop propagation so clicking inside doesn't close -->
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- ── Header ──────────────────────────────────────────────────────────── -->
+      <div class="flex items-start justify-between px-6 pt-6 pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">{{ title }}</h2>
+          <p class="text-xs text-slate-400 mt-0.5">{{ subtitle }}</p>
+        </div>
+        <button
+          id="btn-form-modal-close"
+          (click)="onCancel()"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all shrink-0 ml-4"
+        >
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="px-6 pb-6 space-y-4">
+
+        <!-- ── Name ─────────────────────────────────────────────────────────── -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1.5">Nombre completo</label>
+          <input
+            id="input-form-name"
+            type="text"
+            [(ngModel)]="name"
+            placeholder="Ej. Juan García"
+            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 bg-slate-50 placeholder-slate-300
+                   focus:outline-none focus:ring-2 focus:ring-orange-500/25 focus:border-orange-400 focus:bg-white transition-all"
+          />
+        </div>
+
+        <!-- ── Corporate Email ───────────────────────────────────────────────── -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1.5">Correo corporativo</label>
+          <input
+            id="input-form-email"
+            type="email"
+            [(ngModel)]="email"
+            placeholder="email@auratech.com"
+            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 bg-slate-50 placeholder-slate-300
+                   focus:outline-none focus:ring-2 focus:ring-orange-500/25 focus:border-orange-400 focus:bg-white transition-all"
+          />
+        </div>
+
+        <!-- ── Role ─────────────────────────────────────────────────────────── -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1.5">Rol</label>
+          <div class="relative">
+            <select
+              id="select-form-role"
+              [(ngModel)]="role"
+              class="w-full appearance-none border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-sm text-slate-800 bg-slate-50
+                     focus:outline-none focus:ring-2 focus:ring-orange-500/25 focus:border-orange-400 focus:bg-white transition-all cursor-pointer"
+            >
+              <option value="" disabled>Seleccionar rol</option>
+              @for (r of roles; track r) {
+                <option [value]="r">{{ r }}</option>
+              }
+            </select>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px] pointer-events-none">
+              expand_more
+            </span>
+          </div>
+        </div>
+
+        <!-- ── Confirm Action ────────────────────────────────────────────────── -->
+        <div class="pt-1">
+          <!-- Section label -->
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-orange-500 text-[18px]">shield</span>
+            <span class="text-[11px] font-extrabold text-orange-500 uppercase tracking-widest">Confirmar Acción</span>
+          </div>
+
+          <!-- Admin Password -->
+          <label class="block text-xs font-bold text-slate-600 mb-1.5">Contraseña de administrador</label>
+          <div class="relative">
+            <input
+              id="input-form-admin-password"
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="adminPassword"
+              (ngModelChange)="touched = true"
+              placeholder="Ingresa tu contraseña para autorizar"
+              class="w-full border rounded-xl px-4 py-2.5 pr-12 text-sm text-slate-800 bg-orange-50 placeholder-slate-400
+                     focus:outline-none focus:ring-2 transition-all"
+              [class.border-slate-200]="!passwordTooShort"
+              [class.focus:ring-orange-500\/25]="!passwordTooShort"
+              [class.focus:border-orange-400]="!passwordTooShort"
+              [class.border-red-300]="passwordTooShort"
+              [class.focus:ring-red-500\/20]="passwordTooShort"
+              [class.bg-red-50]="passwordTooShort"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <span class="material-symbols-outlined text-[18px]">
+                {{ showPassword() ? 'lock_open' : 'lock' }}
+              </span>
+            </button>
+          </div>
+
+          <!-- Error: password too short -->
+          @if (passwordTooShort) {
+            <p class="flex items-center gap-1.5 text-xs text-red-500 font-semibold mt-1.5">
+              <span class="material-symbols-outlined text-[14px]">error</span>
+              La contraseña debe tener al menos 8 caracteres.
+            </p>
+          }
+        </div>
+
+        <!-- ── Footer Buttons ────────────────────────────────────────────────── -->
+        <div class="flex gap-3 pt-2">
+          <button
+            id="btn-form-cancel"
+            type="button"
+            (click)="onCancel()"
+            class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 active:scale-95 transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            id="btn-form-submit"
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="!canSubmit"
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-bold
+                   hover:bg-orange-600 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                   transition-all shadow-md shadow-orange-500/25"
+          >
+            {{ submitLabel }}
+            <span class="material-symbols-outlined text-[18px]">{{ submitIcon }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
