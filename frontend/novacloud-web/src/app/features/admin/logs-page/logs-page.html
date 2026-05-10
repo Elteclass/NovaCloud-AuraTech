@@ -1,0 +1,110 @@
+<div class="p-8 font-display">
+  <div class="max-w-[1200px] mx-auto">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Historial de Movimientos</h1>
+        <p class="text-slate-500 mt-2">Auditoría detallada de todas las acciones ejecutadas en el sistema</p>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <button class="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-lg">filter_list</span>
+          Filtros Avanzados
+        </button>
+        <button class="flex items-center gap-2 px-5 py-2.5 bg-orange-500 rounded-lg text-sm font-bold text-white hover:bg-orange-600 transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-lg">download</span>
+          Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 mb-8">
+      <button class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-200 bg-orange-50 text-orange-600 text-sm font-bold transition-colors">
+        Hoy <span class="material-symbols-outlined text-[16px]">expand_more</span>
+      </button>
+      <button class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+        Usuarios Admin <span class="material-symbols-outlined text-[16px]">expand_more</span>
+      </button>
+      <button class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+        Fallidos <span class="material-symbols-outlined text-[16px] text-slate-400">error</span>
+      </button>
+      <button class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
+        Exitosos <span class="material-symbols-outlined text-[16px] text-slate-400">check_circle</span>
+      </button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50/50 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+              <th class="py-4 px-6">Fecha y Hora</th>
+              <th class="py-4 px-6">Usuario</th>
+              <th class="py-4 px-6">Acción</th>
+              <th class="py-4 px-6">Dirección IP</th>
+              <th class="py-4 px-6 text-center">Detalles</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm font-medium text-slate-700">
+            @for (log of auditLogs; track log.date) {
+              <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <td class="py-4 px-6 text-slate-500">{{ log.date }}</td>
+                
+                <td class="py-4 px-6">
+                  <div class="flex items-center gap-3">
+                    <app-user-avatar 
+                      [initials]="log.userInitials" 
+                      [color]="log.avatarColor">
+                    </app-user-avatar>
+                    <span class="font-bold text-slate-900">{{ log.userName }}</span>
+                  </div>
+                </td>
+
+                <td class="py-4 px-6">
+                  <span class="px-3 py-1 text-[11px] font-bold rounded-md uppercase tracking-wider inline-block"
+                        [ngClass]="{
+                          'bg-orange-50 text-orange-600 border border-orange-200': log.actionType === 'warning',
+                          'bg-emerald-50 text-emerald-600 border border-emerald-200': log.actionType === 'success',
+                          'bg-red-50 text-red-600 border border-red-200': log.actionType === 'danger',
+                          'bg-slate-100 text-slate-600 border border-slate-200': log.actionType === 'neutral'
+                        }">
+                    {{ log.action }}
+                  </span>
+                </td>
+
+                <td class="py-4 px-6 font-mono text-slate-500 text-xs">{{ log.ip }}</td>
+                
+                <td class="py-4 px-6 text-center">
+                  <button class="text-slate-400 hover:text-orange-500 transition-colors p-1 rounded-md hover:bg-orange-50">
+                    <span class="material-symbols-outlined text-[20px]">visibility</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="p-6 border-t border-slate-200 flex items-center justify-between text-sm text-slate-500 font-medium">
+        <span>Mostrando 1 a 5 de 345 entradas</span>
+        <div class="flex items-center gap-2">
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600 transition-colors disabled:opacity-50">
+            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+          </button>
+          
+          <button class="w-8 h-8 flex items-center justify-center rounded-md bg-orange-500 text-white font-bold shadow-sm">1</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 transition-colors">2</button>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 transition-colors">3</button>
+          <span class="px-2">...</span>
+          <button class="w-8 h-8 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 transition-colors">12</button>
+          
+          <button class="w-8 h-8 flex items-center justify-center rounded-md border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
