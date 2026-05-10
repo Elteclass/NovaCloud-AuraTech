@@ -1,0 +1,272 @@
+<div class="p-8">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- ── Header ─────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-900 font-display">Gestión de Usuarios</h1>
+        <p class="text-slate-500 mt-1 text-sm">Administra los accesos y roles de tu organización</p>
+      </div>
+      <button
+        id="btn-nuevo-usuario"
+        (click)="openCreateModal()"
+        class="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white text-sm font-bold rounded-xl shadow-md shadow-orange-500/25 hover:bg-orange-600 active:scale-95 transition-all duration-150"
+      >
+        <span class="material-symbols-outlined text-[18px]">person_add</span>
+        Nuevo Usuario
+      </button>
+    </div>
+
+    <!-- ── Stats Cards ─────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5 flex items-center gap-4">
+        <div class="p-2.5 bg-orange-50 rounded-xl">
+          <span class="material-symbols-outlined text-orange-500 text-xl">group</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Usuarios</p>
+          <p class="text-3xl font-bold text-slate-900 mt-0.5">{{ totalUsers() | number }}</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5 flex items-center gap-4">
+        <div class="p-2.5 bg-emerald-50 rounded-xl">
+          <span class="material-symbols-outlined text-emerald-500 text-xl">verified_user</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Activos</p>
+          <p class="text-3xl font-bold text-slate-900 mt-0.5">{{ activeUsers() | number }}</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm px-6 py-5 flex items-center gap-4">
+        <div class="p-2.5 bg-slate-100 rounded-xl">
+          <span class="material-symbols-outlined text-slate-400 text-xl">person_off</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inactivos / Suspendidos</p>
+          <p class="text-3xl font-bold text-slate-900 mt-0.5">{{ inactiveUsers() | number }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Table Card ──────────────────────────────────────────────────────── -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+      <!-- Table Header -->
+      <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] items-center px-6 py-3 border-b border-slate-100 bg-slate-50/70">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nombre y Email</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Rol</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estado</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Acciones</span>
+      </div>
+
+      <!-- Rows -->
+      @for (user of pagedUsers(); track user.id) {
+        <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] items-center px-6 py-4 border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors duration-150 group">
+
+          <!-- Name & Email -->
+          <div class="flex items-center gap-3 min-w-0">
+            <app-user-avatar [initials]="user.avatarInitials" [color]="user.avatarColor" />
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-slate-800 truncate">{{ user.name }}</p>
+              <p class="text-xs text-slate-400 truncate">{{ user.email }}</p>
+            </div>
+          </div>
+
+          <!-- Role -->
+          <div>
+            <app-user-role-badge [role]="user.role" />
+          </div>
+
+          <!-- Status -->
+          <div>
+            <app-user-status-badge [status]="user.status" />
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <button
+              [id]="'btn-edit-' + user.id"
+              (click)="openEditModal(user)"
+              title="Editar usuario"
+              class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-500 hover:bg-blue-50 transition-all duration-150"
+            >
+              <span class="material-symbols-outlined text-[18px]">edit</span>
+            </button>
+            <button
+              [id]="'btn-delete-' + user.id"
+              (click)="confirmDelete(user)"
+              title="Eliminar usuario"
+              class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+            >
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Empty state -->
+      @if (pagedUsers().length === 0) {
+        <div class="py-16 flex flex-col items-center text-center text-slate-400">
+          <span class="material-symbols-outlined text-5xl mb-3">search_off</span>
+          <p class="font-semibold text-slate-500">Sin resultados</p>
+          <p class="text-sm mt-1">No se encontró ningún usuario con esa búsqueda.</p>
+        </div>
+      }
+
+      <!-- Footer: pagination -->
+      <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+        <p class="text-xs text-slate-400 font-medium">
+          Mostrando
+          <span class="font-bold text-slate-600">{{ rangeStart }}-{{ rangeEnd }}</span>
+          de
+          <span class="font-bold text-slate-600">{{ totalUsers() | number }}</span>
+          usuarios
+        </p>
+        <div class="flex items-center gap-1">
+          <button
+            id="btn-page-prev"
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() === 1"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          </button>
+          @for (p of pages(); track p) {
+            <button
+              [id]="'btn-page-' + p"
+              (click)="goToPage(p)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-bold transition-all"
+              [ngClass]="p === currentPage()
+                ? 'bg-orange-500 border-orange-500 text-white shadow-sm shadow-orange-500/30'
+                : 'border-slate-200 text-slate-500 hover:bg-slate-100'"
+            >
+              {{ p }}
+            </button>
+          }
+          <button
+            id="btn-page-next"
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() === totalPages()"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- ── Shared User Form Modal (Create / Edit) ─────────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<app-user-form-modal
+  [visible]="showFormModal()"
+  [mode]="formModalMode()"
+  [user]="userToEdit()"
+  (save)="onFormSave($event)"
+  (cancel)="onFormCancel()"
+/>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- ── Delete Confirm Modal (with admin password) ─────────────────────────── -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+@if (showDeleteModal()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+    (click)="cancelDelete()"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="flex items-start justify-between px-6 pt-6 pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Eliminar Usuario</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Esta acción no se puede deshacer</p>
+        </div>
+        <button
+          id="btn-delete-modal-close"
+          (click)="cancelDelete()"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 transition-all"
+        >
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="px-6 pb-6 space-y-4">
+        <!-- Warning info -->
+        <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
+          <span class="material-symbols-outlined text-red-500 text-2xl shrink-0">delete_forever</span>
+          <p class="text-sm text-red-700 font-medium">
+            Se eliminará <span class="font-bold">{{ userToDelete()?.name }}</span> de forma permanente.
+          </p>
+        </div>
+
+        <!-- Admin Password -->
+        <div class="pt-1">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-orange-500 text-[18px]">shield</span>
+            <span class="text-[11px] font-extrabold text-orange-500 uppercase tracking-widest">Confirmar Acción</span>
+          </div>
+
+          <label class="block text-xs font-bold text-slate-600 mb-1.5">Admin Password</label>
+          <div class="relative">
+            <input
+              id="input-delete-admin-password"
+              [type]="deleteShowPass() ? 'text' : 'password'"
+              [(ngModel)]="deletePassword"
+              (ngModelChange)="deleteTouched = true"
+              placeholder="Enter your password to authorize"
+              class="w-full border rounded-xl px-4 py-2.5 pr-12 text-sm text-slate-800 bg-orange-50 placeholder-slate-400
+                     focus:outline-none focus:ring-2 transition-all"
+              [class.border-slate-200]="!deletePasswordError"
+              [class.border-red-300]="deletePasswordError"
+              [class.bg-red-50]="deletePasswordError"
+            />
+            <button
+              type="button"
+              (click)="deleteShowPass.update(v => !v)"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <span class="material-symbols-outlined text-[18px]">
+                {{ deleteShowPass() ? 'lock_open' : 'lock' }}
+              </span>
+            </button>
+          </div>
+
+          @if (deletePasswordError) {
+            <p class="flex items-center gap-1.5 text-xs text-red-500 font-semibold mt-1.5">
+              <span class="material-symbols-outlined text-[14px]">error</span>
+              La contraseña debe tener al menos 8 caracteres.
+            </p>
+          }
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-3 pt-2">
+          <button
+            id="btn-cancel-delete"
+            (click)="cancelDelete()"
+            class="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 active:scale-95 transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            id="btn-confirm-delete"
+            (click)="executeDelete()"
+            [disabled]="!canDelete"
+            class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold
+                   hover:bg-red-600 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                   transition-all shadow-md shadow-red-500/25"
+          >
+            Eliminar
+            <span class="material-symbols-outlined text-[18px]">delete_forever</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

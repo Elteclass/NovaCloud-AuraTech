@@ -7,21 +7,51 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      @for (card of kpiCards; track card.title) {
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-          <div class="flex justify-between items-start mb-6">
-            <div class="p-2 rounded-lg" [ngClass]="card.iconBgClass">
-              <span class="material-symbols-outlined text-xl" [ngClass]="card.iconTextClass">{{ card.icon }}</span>
-            </div>
-            <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-md">{{ card.growth }}</span>
+
+      <!-- Usuarios Totales — reactive via UserService signal -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-6">
+          <div class="p-2 rounded-lg bg-orange-50">
+            <span class="material-symbols-outlined text-xl text-orange-500">group</span>
           </div>
-          <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ card.title }}</p>
-            <h3 class="text-3xl font-bold text-slate-900">{{ card.value }}</h3>
-          </div>
+          <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-md">+5.2%</span>
         </div>
-      }
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Usuarios Totales</p>
+          <h3 class="text-3xl font-bold text-slate-900">{{ totalUsers() | number }}</h3>
+        </div>
+      </div>
+
+      <!-- Sesiones Activas — usa usuarios activos como proxy hasta tener backend -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-6">
+          <div class="p-2 rounded-lg bg-blue-50">
+            <span class="material-symbols-outlined text-xl text-blue-500">bolt</span>
+          </div>
+          <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-md">+12.4%</span>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Sesiones Activas</p>
+          <h3 class="text-3xl font-bold text-slate-900">{{ activeUsers() | number }}</h3>
+        </div>
+      </div>
+
+      <!-- Tiempo de Actividad — estático -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-6">
+          <div class="p-2 rounded-lg" [ngClass]="staticKpi.iconBgClass">
+            <span class="material-symbols-outlined text-xl" [ngClass]="staticKpi.iconTextClass">{{ staticKpi.icon }}</span>
+          </div>
+          <span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-md">{{ staticKpi.growth }}</span>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ staticKpi.title }}</p>
+          <h3 class="text-3xl font-bold text-slate-900">{{ staticKpi.value }}</h3>
+        </div>
+      </div>
+
     </div>
+
 
     <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm mb-8">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
