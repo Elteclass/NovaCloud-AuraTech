@@ -1,3 +1,6 @@
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NovaCloud.BackendCore.Controllers;
@@ -6,27 +9,51 @@ namespace NovaCloud.BackendCore.Controllers;
 [Route("api/[controller]")]
 public class FilesController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult GetFiles()
+    private readonly string? _bucketName;
+    private readonly RegionEndpoint? _region;
+
+    public FilesController(IConfiguration configuration)
     {
-        var files = new[]
+        _bucketName = configuration["AWS:BucketName"];
+        var regionName = configuration["AWS:Region"];
+        _region = string.IsNullOrWhiteSpace(regionName)
+            ? null
+            : RegionEndpoint.GetBySystemName(regionName);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetFiles(CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(_bucketName) || _region is null)
         {
-            new
-            {
-                name = "reporte-financiero.pdf",
-                size = "2.4MB",
-                type = "pdf",
-                uploadDate = "2026-04-03T10:00:00Z"
-            },
-            new
-            {
-                name = "logo-auratech.png",
-                size = "1.1MB",
-                type = "image",
-                uploadDate = "2026-04-03T11:30:00Z"
-            }
+            return BadRequest("Missing AWS configuration. Ensure AWS__BucketName and AWS__Region are set.");
+        }
+
+        using var s3 = new AmazonS3Client(_region);
+        var request = new ListObjectsV2Request
+        {
+            BucketName = _bucketName
         };
 
+        var response = await s3.ListObjectsV2Async(request, cancellationToken);
+        var files = response.S3Objects.Select(obj => new
+        {
+            name = obj.Key,
+            sizeBytes = obj.Size,
+            type = GetFileType(obj.Key),
+            uploadDate = obj.LastModified.HasValue
+                ? obj.LastModified.Value.ToUniversalTime().ToString("O")
+                : null
+        });
+
         return Ok(files);
+    }
+
+    private static string GetFileType(string key)
+    {
+        var extension = Path.GetExtension(key);
+        return string.IsNullOrWhiteSpace(extension)
+            ? "unknown"
+            : extension.TrimStart('.').ToLowerInvariant();
     }
 }
