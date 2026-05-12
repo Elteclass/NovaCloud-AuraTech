@@ -1,0 +1,14 @@
+services:
+  backend-core:
+    build:
+      context: ./backend-core
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend-core/NovaCloud.BackendCore/.env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      AWS_PROFILE: default
+    volumes:
+      - ${USERPROFILE}/.aws:/root/.aws:ro
