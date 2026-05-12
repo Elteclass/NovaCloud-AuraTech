@@ -1,6 +1,6 @@
 # Backend Core - Estado para el Equipo
 
-Ultima actualizacion: 2026-04-20
+Ultima actualizacion: 2026-05-11
 
 ## Alcance
 Esta carpeta registra el setup de backend-core para la arquitectura base serverless.
@@ -98,20 +98,19 @@ Endpoint de prueba:
 Resultado esperado:
 - `200 OK` con 2 objetos mock requeridos por frontend.
 
-## Evidencia por Adjuntar en PR/Issue
-1. Evidencia de respuesta de `/api/files` (`200 OK` + payload mock requerido).
-2. Nota de que `/api/files` es endpoint mock temporal en esta fase.
+## Como Ejecutar con Docker
 
-## Checklist Rapido de PR
-- [x] .NET SDK verificado
-- [x] AWS CLI verificado
-- [x] Web API inicial creada
-- [x] Paquetes AWS SDK instalados
-- [x] `GET /api/files` mock implementado
-- [x] CORS para frontend habilitado en API
-- [x] Flujo de configuracion local seguro (`.env` + reglas de ignore)
-- [x] IDs de Cognito documentados para handoff
-- [x] Evidencia de CORS en S3 adjunta
+Desde la raiz del repo (docker-compose.yml):
 
-## Estado Actual
-Los requerimientos de backend-core asignados en este issue estan completados.
+```powershell
+docker compose up --build
+```
+
+Endpoint de prueba:
+- `http://localhost:8080/api/files`
+
+Notas:
+- El contenedor usa el perfil AWS local montado desde `~/.aws` y `AWS_PROFILE=default` (ver docker-compose.yml).
+- Si quieres usar otro perfil, cambia `AWS_PROFILE` en docker-compose.yml (ej: `AWS_PROFILE=personal`).
+- La configuracion de la app (`AWS__Region`, `AWS__BucketName`, etc.) se lee desde `backend-core/NovaCloud.BackendCore/.env`.
+- Sin ambos de estos parámetros declarados no es posible hacer uso del servicio backend-core

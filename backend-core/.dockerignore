@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.git/
+**/.vs/
+**/.idea/
+**/.vscode/
+**/*.user
+**/*.suo
+**/*.cache
+**/*.log
+NovaCloud.BackendCore/.env
