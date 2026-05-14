@@ -25,6 +25,11 @@ export const routes: Routes = [
       {
         path: 'users',
         loadComponent: () => import('./features/admin/users-page/users-page').then(c => c.UsersPage)
+      },
+      // --- NUEVA RUTA DE LOGS ---
+      {
+        path: 'logs',
+        loadComponent: () => import('./features/admin/logs-page/logs-page').then(c => c.LogsPage)
       }
     ]
   },
