@@ -9,6 +9,3 @@ services:
       - ./backend-core/NovaCloud.BackendCore/.env
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      AWS_PROFILE: default
-    volumes:
-      - ${USERPROFILE}/.aws:/root/.aws:ro
