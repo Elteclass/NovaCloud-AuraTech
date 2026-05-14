@@ -87,15 +87,14 @@ public sealed class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
     {
-        var token = GetBearerToken(Request.Headers.Authorization);
-        if (string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(request.AccessToken))
         {
-            return BadRequest("Missing bearer token.");
+            return BadRequest("Missing access token.");
         }
 
-        await _authService.LogoutAsync(token);
+        await _authService.LogoutAsync(request.AccessToken);
         return NoContent();
     }
 
@@ -107,19 +106,4 @@ public sealed class AuthController : ControllerBase
         return Ok(response);
     }
 
-    private static string? GetBearerToken(string? authorizationHeader)
-    {
-        if (string.IsNullOrWhiteSpace(authorizationHeader))
-        {
-            return null;
-        }
-
-        const string prefix = "Bearer ";
-        if (!authorizationHeader.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-        {
-            return null;
-        }
-
-        return authorizationHeader[prefix.Length..].Trim();
-    }
 }
