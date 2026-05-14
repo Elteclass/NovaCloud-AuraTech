@@ -59,6 +59,7 @@ public sealed class AuthService : IAuthService
         return new LoginResponse
         {
             Token = result.IdToken,
+            AccessToken = result.AccessToken,
             RefreshToken = result.RefreshToken,
             Role = role,
             Email = email
@@ -92,6 +93,7 @@ public sealed class AuthService : IAuthService
         return new LoginResponse
         {
             Token = result.IdToken,
+            AccessToken = result.AccessToken,
             RefreshToken = result.RefreshToken,
             Role = role,
             Email = email
@@ -123,6 +125,7 @@ public sealed class AuthService : IAuthService
         return new LoginResponse
         {
             Token = result.IdToken,
+            AccessToken = result.AccessToken,
             RefreshToken = request.RefreshToken,
             Role = role,
             Email = email
