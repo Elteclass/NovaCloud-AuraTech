@@ -1,7 +1,6 @@
 <div class="p-8 font-display">
   <div class="max-w-6xl mx-auto">
     
-    <!-- 1. Encabezado y Controles Superiores -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div>
         <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Historial de Movimientos</h1>
@@ -20,7 +19,6 @@
       </div>
     </div>
 
-    <!-- 2. Filtros Rápidos (Pills) Interactivos -->
     <div class="flex flex-wrap items-center gap-3 mb-8">
       <button (click)="setFilter('Hoy')" 
               [ngClass]="activeFilter() === 'Hoy' ? 'border-orange-200 bg-orange-50 text-orange-600' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
@@ -47,7 +45,6 @@
       </button>
     </div>
 
-    <!-- 3. Tabla de Auditoría -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       <div class="overflow-x-auto min-h-[300px]">
         <table class="w-full text-left border-collapse">
@@ -61,7 +58,6 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Aquí usamos pagedLogs() para mostrar solo los de la página actual -->
             @for (log of pagedLogs(); track log.id) {
               <tr class="border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors duration-150 group">
                 <td class="py-4 px-6 text-sm text-slate-500 whitespace-nowrap">{{ log.date }}</td>
@@ -98,13 +94,14 @@
               </tr>
             }
 
-            <!-- Estado vacío (Si un filtro no arroja resultados) -->
             @if (filteredLogs().length === 0) {
               <tr>
-                <td colspan="5" class="py-16 text-center text-slate-400">
-                  <span class="material-symbols-outlined text-4xl mb-2">search_off</span>
-                  <p class="font-semibold text-slate-500">Sin resultados</p>
-                  <p class="text-sm mt-1">No hay registros que coincidan con este filtro.</p>
+                <td colspan="5">
+                  <div class="py-16 flex flex-col items-center text-center text-slate-400">
+                    <span class="material-symbols-outlined text-5xl mb-3">search_off</span>
+                    <p class="font-semibold text-slate-500">Sin resultados</p>
+                    <p class="text-sm mt-1">No hay registros que coincidan con este filtro.</p>
+                  </div>
                 </td>
               </tr>
             }
@@ -112,10 +109,9 @@
         </table>
       </div>
 
-      <!-- 4. Paginación Totalmente Dinámica -->
       <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50">
         <p class="text-xs text-slate-400 font-medium">
-          Mostrando resultados
+          Mostrando
           <span class="font-bold text-slate-600">{{ rangeStart() }}-{{ rangeEnd() }}</span>
           de
           <span class="font-bold text-slate-600">{{ filteredLogs().length }}</span>
@@ -123,22 +119,31 @@
         </p>
         
         <div class="flex items-center gap-1">
-          <!-- Flecha Izquierda -->
-          <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-all">
-            <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+          <button
+            (click)="goToPage(currentPage() - 1)"
+            [disabled]="currentPage() === 1"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            <span class="material-symbols-outlined text-[16px]">chevron_left</span>
           </button>
           
-          <!-- Bucle for para pintar los números dinámicamente -->
           @for (p of pagesArray(); track p) {
-            <button (click)="goToPage(p)" 
-                    [ngClass]="currentPage() === p ? 'bg-orange-50 text-orange-600 font-bold' : 'text-slate-600 hover:bg-slate-100'" 
-                    class="w-8 h-8 flex items-center justify-center rounded-xl text-sm transition-all">
+            <button
+              (click)="goToPage(p)"
+              class="w-8 h-8 flex items-center justify-center rounded-lg border text-xs font-bold transition-all"
+              [ngClass]="p === currentPage()
+                ? 'bg-orange-500 border-orange-500 text-white shadow-sm shadow-orange-500/30'
+                : 'border-slate-200 text-slate-500 hover:bg-slate-100'"
+            >
               {{ p }}
             </button>
           }
           
-          <!-- Flecha Derecha -->
-          <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-all">
+          <button
+            (click)="goToPage(currentPage() + 1)"
+            [disabled]="currentPage() === totalPages()"
+            class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
             <span class="material-symbols-outlined text-[18px]">chevron_right</span>
           </button>
         </div>
