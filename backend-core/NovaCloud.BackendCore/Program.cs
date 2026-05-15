@@ -1,5 +1,8 @@
 using Amazon;
 using Amazon.CognitoIdentityProvider;
+using Amazon.DynamoDBv2;
+using Amazon.Runtime;
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NovaCloud.BackendCore.Services;
@@ -21,12 +24,26 @@ if (string.IsNullOrWhiteSpace(awsRegion) ||
 }
 
 var regionEndpoint = RegionEndpoint.GetBySystemName(awsRegion);
+var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+
+if (string.IsNullOrWhiteSpace(awsAccessKeyId) || string.IsNullOrWhiteSpace(awsSecretAccessKey))
+{
+    throw new InvalidOperationException(
+        "Missing AWS credentials. Ensure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are set.");
+}
+
+var awsCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
 
 // Services
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IAmazonCognitoIdentityProvider>(_ =>
     new AmazonCognitoIdentityProviderClient(regionEndpoint));
+builder.Services.AddSingleton<IAmazonDynamoDB>(_ =>
+    new AmazonDynamoDBClient(awsCredentials, regionEndpoint));
+builder.Services.AddSingleton<IAmazonS3>(_ =>
+    new AmazonS3Client(awsCredentials, regionEndpoint));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -45,6 +62,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IFilesService, FilesService>();
+builder.Services.AddScoped<IUploadsService, UploadsService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendDev", policy =>
