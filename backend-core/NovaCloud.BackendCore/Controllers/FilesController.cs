@@ -1,59 +1,183 @@
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NovaCloud.BackendCore.DTOs.Files;
+using NovaCloud.BackendCore.Services;
 
 namespace NovaCloud.BackendCore.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class FilesController : ControllerBase
 {
-    private readonly string? _bucketName;
-    private readonly RegionEndpoint? _region;
+    private readonly IFileService _fileService;
 
-    public FilesController(IConfiguration configuration)
+    public FilesController(IFileService fileService)
     {
-        _bucketName = configuration["AWS:BucketName"];
-        var regionName = configuration["AWS:Region"];
-        _region = string.IsNullOrWhiteSpace(regionName)
-            ? null
-            : RegionEndpoint.GetBySystemName(regionName);
+        _fileService = fileService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetFiles(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<FileResponse>>> ListFiles(
+        [FromQuery] string? filter = null,
+        [FromQuery] string? tag = null,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_bucketName) || _region is null)
+        try
         {
-            return BadRequest("Missing AWS configuration. Ensure AWS__BucketName and AWS__Region are set.");
+            var files = await _fileService.ListAsync(filter, tag, User, cancellationToken);
+            return Ok(files);
         }
-
-        using var s3 = new AmazonS3Client(_region);
-        var request = new ListObjectsV2Request
+        catch (InvalidOperationException ex)
         {
-            BucketName = _bucketName
-        };
-
-        var response = await s3.ListObjectsV2Async(request, cancellationToken);
-        var files = response.S3Objects.Select(obj => new
-        {
-            name = obj.Key,
-            sizeBytes = obj.Size,
-            type = GetFileType(obj.Key),
-            uploadDate = obj.LastModified.HasValue
-                ? obj.LastModified.Value.ToUniversalTime().ToString("O")
-                : null
-        });
-
-        return Ok(files);
+            return BadRequest(ex.Message);
+        }
     }
 
-    private static string GetFileType(string key)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<FileMetadataResponse>> GetFile(
+        string id,
+        CancellationToken cancellationToken = default)
     {
-        var extension = Path.GetExtension(key);
-        return string.IsNullOrWhiteSpace(extension)
-            ? "unknown"
-            : extension.TrimStart('.').ToLowerInvariant();
+        try
+        {
+            var metadata = await _fileService.GetAsync(id, cancellationToken);
+            return Ok(metadata);
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("{id}/download")]
+    public async Task<ActionResult<object>> GetDownloadUrl(
+        string id,
+        [FromQuery] int? expirationMinutes = null,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var ttl = expirationMinutes.HasValue
+                ? TimeSpan.FromMinutes(expirationMinutes.Value)
+                : null;
+            var downloadUrl = await _fileService.GetDownloadUrlAsync(id, ttl, cancellationToken);
+            return Ok(new { downloadUrl });
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPatch("{id}/rename")]
+    public async Task<IActionResult> RenameFile(
+        string id,
+        [FromBody] RenameRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.NewName))
+        {
+            return BadRequest("NewName cannot be empty.");
+        }
+
+        try
+        {
+            await _fileService.RenameAsync(id, request.NewName, cancellationToken);
+            return NoContent();
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id}/star")]
+    public async Task<IActionResult> StarFile(
+        string id,
+        [FromQuery] bool starred = true,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _fileService.StarAsync(id, starred, cancellationToken);
+            return NoContent();
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id}/trash")]
+    public async Task<IActionResult> MoveToTrash(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _fileService.MoveToTrashAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id}/restore")]
+    public async Task<IActionResult> RestoreFile(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _fileService.RestoreAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (Amazon.S3.AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return NotFound("File not found.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFile(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _fileService.DeleteAsync(id, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
