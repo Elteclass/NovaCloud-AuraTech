@@ -1,59 +1,191 @@
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NovaCloud.BackendCore.DTOs.Files;
+using NovaCloud.BackendCore.Services;
 
 namespace NovaCloud.BackendCore.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Authorize]
+[Route("api/files")]
 public class FilesController : ControllerBase
 {
-    private readonly string? _bucketName;
-    private readonly RegionEndpoint? _region;
+    private readonly IFilesService _filesService;
 
-    public FilesController(IConfiguration configuration)
+    public FilesController(IFilesService filesService)
     {
-        _bucketName = configuration["AWS:BucketName"];
-        var regionName = configuration["AWS:Region"];
-        _region = string.IsNullOrWhiteSpace(regionName)
-            ? null
-            : RegionEndpoint.GetBySystemName(regionName);
+        _filesService = filesService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetFiles(CancellationToken cancellationToken)
+    public async Task<IActionResult> ListFiles([FromQuery] string? filter, [FromQuery] string? tag)
     {
-        if (string.IsNullOrWhiteSpace(_bucketName) || _region is null)
+        var userId = GetUserId();
+        if (userId is null)
         {
-            return BadRequest("Missing AWS configuration. Ensure AWS__BucketName and AWS__Region are set.");
+            return Unauthorized();
         }
 
-        using var s3 = new AmazonS3Client(_region);
-        var request = new ListObjectsV2Request
-        {
-            BucketName = _bucketName
-        };
-
-        var response = await s3.ListObjectsV2Async(request, cancellationToken);
-        var files = response.S3Objects.Select(obj => new
-        {
-            name = obj.Key,
-            sizeBytes = obj.Size,
-            type = GetFileType(obj.Key),
-            uploadDate = obj.LastModified.HasValue
-                ? obj.LastModified.Value.ToUniversalTime().ToString("O")
-                : null
-        });
-
+        var files = await _filesService.ListFilesAsync(userId, filter, tag);
         return Ok(files);
     }
 
-    private static string GetFileType(string key)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetFileById(string id)
     {
-        var extension = Path.GetExtension(key);
-        return string.IsNullOrWhiteSpace(extension)
-            ? "unknown"
-            : extension.TrimStart('.').ToLowerInvariant();
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var file = await _filesService.GetFileByIdAsync(userId, id);
+        return file is null ? NotFound() : Ok(file);
+    }
+
+    [HttpGet("{id}/download")]
+    public async Task<IActionResult> GetDownloadUrl(string id)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var url = await _filesService.GetDownloadUrlAsync(userId, id);
+            return Ok(new { url });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPatch("{id}/rename")]
+    public async Task<IActionResult> RenameFile(string id, [FromBody] RenameRequest request)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var file = await _filesService.RenameFileAsync(userId, id, request.NewName);
+            return Ok(file);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("{id}/star")]
+    public async Task<IActionResult> ToggleStar(string id)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var file = await _filesService.StarFileAsync(userId, id);
+            return Ok(file);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("{id}/trash")]
+    public async Task<IActionResult> TrashFile(string id)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var file = await _filesService.TrashFileAsync(userId, id);
+            return Ok(file);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("{id}/restore")]
+    public async Task<IActionResult> RestoreFile(string id)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var file = await _filesService.RestoreFileAsync(userId, id);
+            return Ok(file);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFile(string id)
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _filesService.DeleteFileAsync(userId, id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpGet("/api/storage/usage")]
+    public async Task<IActionResult> GetStorageUsage()
+    {
+        var userId = GetUserId();
+        if (userId is null)
+        {
+            return Unauthorized();
+        }
+
+        var usage = await _filesService.GetStorageUsageAsync(userId);
+        return Ok(usage);
+    }
+
+    private string? GetUserId()
+    {
+        return User.FindFirstValue("sub")
+            ?? User.FindFirstValue("username")
+            ?? User.FindFirstValue("cognito:username")
+            ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 }
