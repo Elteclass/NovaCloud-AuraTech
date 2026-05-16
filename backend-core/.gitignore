@@ -2,6 +2,9 @@
 devnotes.md
 manual_endpoint_testing.txt
 
+# Ignore Visual Studio cache files
+**/NovaCloud.BackendCore/NovaCloud.BackendCore.csproj.lscache
+
 # Build outputs
 **/bin/
 **/obj/
