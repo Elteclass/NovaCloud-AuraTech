@@ -120,6 +120,46 @@
           }
         </div>
 
+        @if (mode === 'create') {
+          <!-- ── Initial User Password ───────────────────────────────────────── -->
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Contraseña inicial del usuario</label>
+            <div class="relative">
+              <input
+                id="input-form-user-password"
+                [type]="showUserPassword() ? 'text' : 'password'"
+                [(ngModel)]="userPassword"
+                (ngModelChange)="touched = true"
+                placeholder="Define la contraseña de acceso del nuevo usuario"
+                class="w-full border rounded-xl px-4 py-2.5 pr-12 text-sm text-slate-800 bg-slate-50 placeholder-slate-400
+                       focus:outline-none focus:ring-2 transition-all"
+                [class.border-slate-200]="!userPasswordTooShort"
+                [class.focus:ring-orange-500\/25]="!userPasswordTooShort"
+                [class.focus:border-orange-400]="!userPasswordTooShort"
+                [class.border-red-300]="userPasswordTooShort"
+                [class.focus:ring-red-500\/20]="userPasswordTooShort"
+                [class.bg-red-50]="userPasswordTooShort"
+              />
+              <button
+                type="button"
+                (click)="toggleUserPassword()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <span class="material-symbols-outlined text-[18px]">
+                  {{ showUserPassword() ? 'lock_open' : 'lock' }}
+                </span>
+              </button>
+            </div>
+
+            @if (userPasswordTooShort) {
+              <p class="flex items-center gap-1.5 text-xs text-red-500 font-semibold mt-1.5">
+                <span class="material-symbols-outlined text-[14px]">error</span>
+                La contraseña del usuario debe tener al menos 8 caracteres.
+              </p>
+            }
+          </div>
+        }
+
         <!-- ── Footer Buttons ────────────────────────────────────────────────── -->
         <div class="flex gap-3 pt-2">
           <button

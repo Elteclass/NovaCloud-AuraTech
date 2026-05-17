@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
-import { UserService } from '../../../core/services/user.service';
+import { AdminService } from '../../../core/services/http/admin.service';
+import { AuthService } from '../../../core/services/http/auth.service';
+import { TokenService } from '../../../core/services/token.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -16,7 +18,11 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class AdminLayout {
   private router = inject(Router);
-  private userService = inject(UserService);
+  private adminService = inject(AdminService);
+  private authService = inject(AuthService);
+  private tokenService = inject(TokenService);
+  showUserMenu = false;
+  isLoggingOut = false;
 
   /** True cuando la ruta activa es /admin/users */
   readonly isUsersSection = toSignal(
@@ -28,10 +34,33 @@ export class AdminLayout {
   );
 
   get searchValue(): string {
-    return this.userService.searchQuery();
+    return this.adminService.searchQuery();
   }
 
   onSearch(value: string): void {
-    this.userService.setSearchQuery(value);
+    this.adminService.setSearchQuery(value);
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  logout(): void {
+    if (this.isLoggingOut) {
+      return;
+    }
+
+    this.isLoggingOut = true;
+    this.authService.logout().subscribe({
+      next: () => {
+        this.isLoggingOut = false;
+        this.showUserMenu = false;
+      },
+      error: () => {
+        this.isLoggingOut = false;
+        this.tokenService.clear();
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }

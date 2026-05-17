@@ -1,17 +1,28 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CloudFile } from '../../../core/models/cloud-file.model';
 import { FileListViewComponent } from '../../../shared/components/file-list-view/file-list-view.component';
+import { FilesService } from '../../../core/services/http/files.service';
 
 @Component({
   selector: 'app-trash-page',
   imports: [CommonModule, FileListViewComponent],
   templateUrl: './trash-page.html'
 })
-export class TrashPage {
-  // Mock: Archivos eliminados
-  trashedFiles: CloudFile[] = [
-    { name: 'Factura_Vieja_2023.pdf', size: '1.1 MB', type: 'pdf', uploadDate: new Date('2026-04-10'), timeAgo: 'Eliminado hace 2 días', owner: 'Carlos Ruiz', tags: ['#Finanzas'] },
-    { name: 'Copia_de_Borrador.doc', size: '500 KB', type: 'doc', uploadDate: new Date('2026-04-05'), timeAgo: 'Eliminado hace 5 días', owner: 'Luis Mendoza', tags: ['#Borrador'] },
-  ];
+export class TrashPage implements OnInit {
+  trashedFiles: CloudFile[] = [];
+  private readonly platformId = inject(PLATFORM_ID);
+
+  constructor(private filesService: FilesService) {}
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.filesService.listFiles('trash').subscribe({
+      next: (files) => this.trashedFiles = files,
+      error: () => this.trashedFiles = []
+    });
+  }
 }

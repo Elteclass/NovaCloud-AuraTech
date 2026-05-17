@@ -24,11 +24,6 @@
           class="h-full flex items-center px-4 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
         >Usuarios</a>
 
-        <a
-          routerLink="/admin/logs"
-          routerLinkActive="text-orange-500 border-b-2 border-orange-500 font-bold"
-          class="h-full flex items-center px-4 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-        >Logs</a>
       </nav>
     </div>
 
@@ -58,14 +53,33 @@
         <span class="material-symbols-outlined text-[18px]">help</span>
       </button>
       <div class="h-8 w-px bg-slate-200 mx-2"></div>
-      <div class="flex items-center gap-3">
-        <div class="text-right hidden sm:block">
-          <p class="text-sm font-bold text-slate-900 leading-none">Admin Principal</p>
-          <p class="text-[10px] text-slate-500 mt-1 font-medium">ID: 04294</p>
-        </div>
-        <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center font-bold text-sm">
-          AP
-        </div>
+      <div class="relative">
+        <button type="button" class="flex items-center gap-3" (click)="toggleUserMenu()" aria-label="Abrir menu de administrador">
+          <div class="text-right hidden sm:block">
+            <p class="text-sm font-bold text-slate-900 leading-none">Admin Principal</p>
+            <p class="text-[10px] text-slate-500 mt-1 font-medium">ID: 04294</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center font-bold text-sm">
+            AP
+          </div>
+        </button>
+
+        @if (showUserMenu) {
+          <div class="absolute right-0 top-14 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-2 z-20">
+            <div class="px-3 py-2 border-b border-slate-100">
+              <p class="text-sm font-bold text-slate-900">Admin Principal</p>
+              <p class="text-xs text-slate-500 mt-1">Administrator session</p>
+            </div>
+
+            <button
+              type="button"
+              class="w-full mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              (click)="logout()">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              {{ isLoggingOut ? 'Closing session...' : 'Log out' }}
+            </button>
+          </div>
+        }
       </div>
     </div>
   </header>

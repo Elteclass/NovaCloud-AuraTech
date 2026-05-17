@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; // 1. Agrega ReactiveFormsModule aquí
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/http/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,7 @@ export class Login {
   loginForm: FormGroup;
   isLoading = false;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private authService: AuthService) {
     // Se define el modelo de datos y sus reglas
     this.loginForm = this.fb.group({
       email: ['', [
@@ -36,24 +37,24 @@ export class Login {
     if (this.loginForm.invalid) return;
 
     this.isLoading = true;
-    
-    setTimeout(() => {
-    this.isLoading = false;
     const email = this.loginForm.value.email;
-    
-    // Guardamos el token de sesión
-    localStorage.setItem('auratech_token', 'mock-jwt-token-12345');
-    
-    // Lógica para diferenciar Admin de Usuario
+    const password = this.loginForm.value.password;
 
-    if (email === 'admin@auratech.com') {
-      localStorage.setItem('auratech_role', 'admin'); // Guardamos el rol
-      this.router.navigate(['/admin/dashboard']);    // Redirigimos a la zona admin
-    } else {
-      localStorage.setItem('auratech_role', 'user');
-      this.router.navigate(['/dashboard']);          // Redirigimos a la zona usuario
-    }
-    }, 1500);
+    this.authService.login(email, password).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        const role = res?.role || 'user';
+        if (role === 'admin') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: () => {
+        this.isLoading = false;
+        alert('Login failed');
+      }
+    });
   }
 
 }

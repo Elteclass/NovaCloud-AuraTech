@@ -1,7 +1,7 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserService } from '../../../core/services/user.service';
+import { AdminService } from '../../../core/services/http/admin.service';
 import { UserAvatarComponent } from '../../../shared/components/user-avatar/user-avatar.component';
 import { UserStatusBadgeComponent } from '../../../shared/components/user-status-badge/user-status-badge.component';
 import { UserRoleBadgeComponent } from '../../../shared/components/user-role-badge/user-role-badge.component';
@@ -27,28 +27,25 @@ const ADMIN_PASSWORD_MIN_LENGTH = 8;
 })
 export class UsersPage {
 
-  private readonly userService = inject(UserService);
+  private readonly adminService = inject(AdminService);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  // ─── Stats ────────────────────────────────────────────────────────────────
-  readonly totalUsers    = this.userService.totalUsers;
-  readonly activeUsers   = this.userService.activeUsers;
-  readonly inactiveUsers = this.userService.inactiveUsers;
+  // ─── Stats (remote) ───────────────────────────────────────────────────────
+  readonly totalUsers    = this.adminService.totalUsers;
+  readonly activeUsers   = this.adminService.activeUsers;
+  readonly inactiveUsers = this.adminService.inactiveUsers;
 
   // ─── Pagination ───────────────────────────────────────────────────────────
   readonly currentPage = signal(1);
-
   readonly pagedUsers = computed(() => {
+    const list = this.adminService.filteredUsers();
     const start = (this.currentPage() - 1) * PAGE_SIZE;
-    return this.userService.filteredUsers().slice(start, start + PAGE_SIZE);
+    return list.slice(start, start + PAGE_SIZE);
   });
 
-  readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.userService.filteredUsers().length / PAGE_SIZE))
-  );
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.adminService.filteredUsers().length / PAGE_SIZE)));
 
-  readonly pages = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, i) => i + 1)
-  );
+  readonly pages = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   // ─── User Form Modal (create / edit) ──────────────────────────────────────
   showFormModal  = signal(false);
@@ -69,38 +66,20 @@ export class UsersPage {
 
   onFormSave(data: UserFormData): void {
     // Mock auth: password must be ≥ 8 chars (already enforced in the component)
-    if (data.adminPassword.length < ADMIN_PASSWORD_MIN_LENGTH) return;
-
+    if (data.adminPassword.length < ADMIN_PASSWORD_MIN_LENGTH || data.userPassword.length < ADMIN_PASSWORD_MIN_LENGTH) return;
     if (this.formModalMode() === 'create') {
-      const initials = data.name
-        .split(' ')
-        .map(w => w[0])
-        .join('')
-        .substring(0, 2)
-        .toUpperCase();
-
-      this.userService.addUser({
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        status: data.status,
-        avatarInitials: initials,
-        avatarColor: 'blue',
-        createdAt: new Date().toISOString().split('T')[0],
-        lastLogin: '—',
+      this.adminService.createUser({ email: data.email, name: data.name, role: data.role, password: data.userPassword }).subscribe({
+        next: () => { this.currentPage.set(1); this.showFormModal.set(false); },
+        error: () => alert('Error creating user')
       });
-      this.currentPage.set(1);
     } else if (this.formModalMode() === 'edit' && this.userToEdit()) {
-      this.userService.updateUser({
-        ...this.userToEdit()!,
-        name:   data.name,
-        email:  data.email,
-        role:   data.role,
-        status: data.status,
+      const id = (this.userToEdit() as any).id;
+      this.adminService.updateUser(id, { email: data.email, name: data.name, role: data.role, status: data.status }).subscribe({
+        next: () => { this.currentPage.set(1); this.showFormModal.set(false); },
+        error: () => alert('Error updating user')
       });
     }
 
-    this.showFormModal.set(false);
     this.userToEdit.set(null);
   }
 
@@ -135,15 +114,23 @@ export class UsersPage {
   executeDelete(): void {
     this.deleteTouched = true;
     if (!this.canDelete) return;
-    this.userService.deleteUser(this.userToDelete()!.id);
-    this.currentPage.set(1);
-    this.showDeleteModal.set(false);
-    this.userToDelete.set(null);
+    const id = this.userToDelete()!.id;
+    this.adminService.deleteUser(id).subscribe({ next: () => { this.currentPage.set(1); this.showDeleteModal.set(false); this.userToDelete.set(null); }, error: () => alert('Error deleting user') });
   }
 
   cancelDelete(): void {
     this.showDeleteModal.set(false);
     this.userToDelete.set(null);
+  }
+
+  // ─── Data loading ────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.adminService.loadUsers();
+    this.adminService.loadStats();
   }
 
   // ─── Pagination helpers ───────────────────────────────────────────────────
@@ -152,9 +139,9 @@ export class UsersPage {
   }
 
   get rangeStart(): number {
-    return Math.min((this.currentPage() - 1) * PAGE_SIZE + 1, this.userService.filteredUsers().length);
+    return Math.min((this.currentPage() - 1) * PAGE_SIZE + 1, this.adminService.filteredUsers().length);
   }
   get rangeEnd(): number {
-    return Math.min(this.currentPage() * PAGE_SIZE, this.userService.filteredUsers().length);
+    return Math.min(this.currentPage() * PAGE_SIZE, this.adminService.filteredUsers().length);
   }
 }

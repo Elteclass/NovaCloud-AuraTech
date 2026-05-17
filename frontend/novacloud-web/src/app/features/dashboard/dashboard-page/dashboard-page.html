@@ -8,6 +8,41 @@
   </div>
 
   <section class="mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Archivos totales</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">{{ files.length }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Carpetas</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">{{ folders.length }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Destacados</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">{{ starredFiles.length }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Papelera</p>
+        <p class="mt-2 text-3xl font-bold text-slate-900">{{ trashedFiles.length }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Uso de almacenamiento</h2>
+          <p class="text-sm text-slate-500 mt-1">Datos reales desde el endpoint <span class="font-semibold">/api/storage/usage</span></p>
+        </div>
+        <div class="text-right">
+          <p class="text-3xl font-bold text-orange-500">{{ storageUsage.percentage }}%</p>
+          <p class="text-sm text-slate-400 font-medium">{{ storageUsage.usedGB }} GB de {{ storageUsage.totalGB }} GB</p>
+        </div>
+      </div>
+      <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+        <div class="bg-orange-500 h-full rounded-full transition-all" [style.width.%]="storageUsage.percentage"></div>
+      </div>
+    </div>
+
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-slate-900">Carpetas</h2>
       <button class="text-primary text-sm font-semibold hover:underline">Ver todas</button>
@@ -38,6 +73,61 @@
             }
           </div>
         </div>
+      }
+    </div>
+  </section>
+
+  <section class="mb-10">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-slate-900">Archivos recientes</h2>
+      <button class="text-primary text-sm font-semibold hover:underline">Ver recientes</button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      @for (file of recentFiles; track file.name) {
+        <div class="flex items-center justify-between gap-4 px-5 py-4 border-b border-slate-100 last:border-0">
+          <div class="min-w-0">
+            <p class="font-semibold text-slate-900 truncate">{{ file.name }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ file.owner || 'Yo' }} • {{ file.size }} • {{ file.uploadDate | date:'short' }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            @for (tag of file.tags?.slice(0, 2); track tag) {
+              <span class="text-[10px] bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full font-medium">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+      @if (recentFiles.length === 0) {
+        <div class="p-8 text-center text-slate-500">No hay archivos recientes.</div>
+      }
+    </div>
+  </section>
+
+  <section class="mb-10">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-slate-900">Destacados</h2>
+      <button class="text-primary text-sm font-semibold hover:underline">Ver destacados</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      @for (file of starredFiles; track file.name) {
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-semibold text-slate-900 truncate">{{ file.name }}</p>
+              <p class="text-xs text-slate-500">{{ file.size }} • {{ file.owner || 'Yo' }}</p>
+            </div>
+            <span class="material-symbols-outlined text-yellow-500">star</span>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-1.5">
+            @for (tag of file.tags; track tag) {
+              <span class="text-[10px] bg-slate-50 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-full font-medium">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+      @if (starredFiles.length === 0) {
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center text-slate-500 md:col-span-2 xl:col-span-3">No hay archivos destacados.</div>
       }
     </div>
   </section>

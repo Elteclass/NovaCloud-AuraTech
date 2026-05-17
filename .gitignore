@@ -1,0 +1,26 @@
+# Secrets and local environment files
+.env
+.env.*
+*.env
+*.local
+
+# Private keys, certificates, and signing material
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+*.jks
+*.keystore
+
+# Local API and REST client scratch files
+*.http.local
+*.rest
+
+# Common local test artifacts
+*.seed
+*.sqlite
+*.db

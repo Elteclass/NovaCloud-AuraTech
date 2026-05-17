@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { UserService } from '../../../core/services/user.service';
+import { Component, inject, OnInit, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AdminService } from '../../../core/services/http/admin.service';
 
-interface LogEntry {
+interface RecentRecord {
   title: string;
   details: string;
   icon: string;
@@ -16,11 +16,12 @@ interface LogEntry {
 })
 export class AdminDashboard {
 
-  private readonly userService = inject(UserService);
+  private readonly adminService = inject(AdminService);
+  private readonly platformId = inject(PLATFORM_ID);
 
-  // ── KPIs — sourced from UserService so they stay in sync with the Users section
-  readonly totalUsers  = this.userService.totalUsers;   // signal
-  readonly activeUsers = this.userService.activeUsers;  // signal (used as "Sesiones Activas" mock)
+  // ── KPIs — sourced from AdminService
+  readonly totalUsers  = this.adminService.totalUsers;   // signal
+  readonly activeUsers = this.adminService.activeUsers;  // signal
 
   /** KPI cards that don't need reactive data */
   readonly staticKpi = {
@@ -32,10 +33,25 @@ export class AdminDashboard {
     iconTextClass: 'text-purple-500',
   };
 
-  // ── Logs del Sistema
-  latestLogs: LogEntry[] = [
-    { title: 'Pico de Latencia - EU-West',          details: 'Detectado hace 4 mins • Resuelto automáticamente', icon: 'warning',       iconClass: 'text-amber-500' },
-    { title: 'Nuevo Administrador Creado',           details: 'Por Admin Principal • hace 12 mins',               icon: 'check_circle',  iconClass: 'text-emerald-500' },
-    { title: 'Mantenimiento del Sistema Programado', details: 'Para el domingo, 02:00 AM UTC',                    icon: 'info',          iconClass: 'text-blue-500' },
-  ];
+  // ── Últimos Registros (derivados del backend)
+  readonly latestRecords = computed<RecentRecord[]>(() => {
+    return [...this.adminService.users()]
+      .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+      .slice(0, 3)
+      .map(user => ({
+        title: user.name || user.email,
+        details: `${user.role} • ${user.status} • creado ${new Date(user.createdAt).toLocaleDateString('es-ES')}`,
+        icon: user.role === 'Administrador' ? 'admin_panel_settings' : 'person',
+        iconClass: user.role === 'Administrador' ? 'text-orange-500' : 'text-slate-500',
+      }));
+  });
+
+  ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.adminService.loadUsers();
+    this.adminService.loadStats();
+  }
 }
