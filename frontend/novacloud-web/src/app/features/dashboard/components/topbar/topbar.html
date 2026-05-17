@@ -27,24 +27,69 @@
   <!-- Right Actions & Profile -->
   <div class="flex items-center gap-4">
     <!-- Notifications -->
-    <button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors relative">
-      <span class="material-symbols-outlined">notifications</span>
-      @if (notificationCount > 0) {
-        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
-          {{ notificationCount }}
-        </span>
+    <div class="relative">
+      <button
+        class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors relative"
+        (click)="onNotificationsClick()"
+        aria-label="Abrir notificaciones">
+        <span class="material-symbols-outlined">notifications</span>
+        @if (notificationCount > 0) {
+          <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+            {{ notificationCount }}
+          </span>
+        }
+      </button>
+
+      @if (showNotificationsPanel) {
+        <div class="absolute right-0 top-12 w-72 rounded-xl border border-slate-200 bg-white shadow-lg p-4 z-20">
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <p class="text-sm font-bold text-slate-900">Notificaciones</p>
+            @if (notificationCount > 0) {
+              <span class="text-xs font-semibold text-primary">{{ notificationCount }}</span>
+            }
+          </div>
+
+          @if (notificationCount === 0) {
+            <p class="text-sm text-slate-500">No notifications.</p>
+          } @else {
+            <p class="text-sm text-slate-500">You have {{ notificationCount }} pending notifications.</p>
+          }
+        </div>
       }
-    </button>
+    </div>
 
     <!-- Profile Chip -->
-    <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
-      <div class="text-right hidden sm:block">
-        <p class="text-sm font-bold leading-none">{{ user.fullName }}</p>
-        <p class="text-xs text-slate-500 mt-1">{{ user.role }}</p>
-      </div>
-      <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
-           [style.background-image]="'url(' + user.avatarUrl + ')'">
-      </div>
+    <div class="relative pl-4 border-l border-slate-200">
+      <button
+        type="button"
+        class="flex items-center gap-3"
+        (click)="onUserMenuClick()"
+        aria-label="Abrir menu de usuario">
+        <div class="text-right hidden sm:block">
+          <p class="text-sm font-bold leading-none">{{ user.fullName }}</p>
+          <p class="text-xs text-slate-500 mt-1">{{ user.role }}</p>
+        </div>
+        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
+             [style.background-image]="'url(' + user.avatarUrl + ')'">
+        </div>
+      </button>
+
+      @if (showUserMenu) {
+        <div class="absolute right-0 top-14 w-56 rounded-xl border border-slate-200 bg-white shadow-lg p-2 z-20">
+          <div class="px-3 py-2 border-b border-slate-100">
+            <p class="text-sm font-bold text-slate-900 truncate">{{ user.fullName }}</p>
+            <p class="text-xs text-slate-500 mt-1 truncate">{{ user.role }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="w-full mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            (click)="logout()">
+            <span class="material-symbols-outlined text-[18px]">logout</span>
+            {{ isLoggingOut ? 'Closing session...' : 'Log out' }}
+          </button>
+        </div>
+      }
     </div>
   </div>
 </div>

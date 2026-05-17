@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AdminService } from '../../../core/services/http/admin.service';
 
 interface RecentRecord {
@@ -17,6 +17,7 @@ interface RecentRecord {
 export class AdminDashboard {
 
   private readonly adminService = inject(AdminService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   // ── KPIs — sourced from AdminService
   readonly totalUsers  = this.adminService.totalUsers;   // signal
@@ -46,6 +47,10 @@ export class AdminDashboard {
   });
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.adminService.loadUsers();
     this.adminService.loadStats();
   }

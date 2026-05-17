@@ -1,5 +1,5 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/http/admin.service';
 import { UserAvatarComponent } from '../../../shared/components/user-avatar/user-avatar.component';
@@ -28,6 +28,7 @@ const ADMIN_PASSWORD_MIN_LENGTH = 8;
 export class UsersPage {
 
   private readonly adminService = inject(AdminService);
+  private readonly platformId = inject(PLATFORM_ID);
 
   // ─── Stats (remote) ───────────────────────────────────────────────────────
   readonly totalUsers    = this.adminService.totalUsers;
@@ -124,6 +125,10 @@ export class UsersPage {
 
   // ─── Data loading ────────────────────────────────────────────────────────
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.adminService.loadUsers();
     this.adminService.loadStats();
   }

@@ -1,5 +1,5 @@
-import { Component, OnInit, effect, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, effect, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { CloudFile, CloudFolder, StorageInfo } from '../../../core/models/cloud-file.model';
 import { FileListViewComponent } from '../../../shared/components/file-list-view/file-list-view.component';
@@ -22,7 +22,12 @@ export class DashboardPage implements OnInit {
   storageUsage: StorageInfo = { usedGB: 0, totalGB: 0, percentage: 0 };
   isLoading = false;
   private readonly folderModalService = inject(FolderModalService);
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly refreshFoldersEffect = effect(() => {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.folderModalService.refreshTick();
     this.loadFolders();
   });
@@ -30,6 +35,10 @@ export class DashboardPage implements OnInit {
   constructor(private filesService: FilesService, private foldersService: FoldersService) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadDashboardData();
   }
 

@@ -34,7 +34,6 @@ public sealed class UploadsService : IUploadsService
             BucketName = _bucketName,
             Key = fullKey,
             Verb = HttpVerb.PUT,
-            ContentType = request.ContentType,
             Expires = DateTime.UtcNow.AddMinutes(15)
         };
 
