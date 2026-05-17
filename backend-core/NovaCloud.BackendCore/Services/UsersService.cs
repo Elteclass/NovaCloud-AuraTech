@@ -39,6 +39,11 @@ public sealed class UsersService : IUsersService
 
     public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new ArgumentException("Password is required.", nameof(request.Password));
+        }
+
         var tempPassword = $"{Guid.NewGuid():N}"[..12] + "Aa1!";
         var createResponse = await _cognito.AdminCreateUserAsync(new AdminCreateUserRequest
         {
@@ -61,12 +66,28 @@ public sealed class UsersService : IUsersService
             GroupName = request.Role
         });
 
+        await _cognito.AdminSetUserPasswordAsync(new AdminSetUserPasswordRequest
+        {
+            UserPoolId = _userPoolId,
+            Username = request.Email,
+            Password = request.Password,
+            Permanent = true
+        });
+
         var createdUser = createResponse.User;
-        return MapUser(createdUser.Username,
+        if (createdUser is null)
+        {
+            throw new InvalidOperationException("User creation succeeded but no user payload was returned.");
+        }
+
+        return MapUser(
+            createdUser.Username,
             createdUser.Attributes,
             createdUser.Enabled,
             createdUser.UserCreateDate,
-            request.Role);
+            request.Role,
+            request.Email,
+            request.Name);
     }
 
     public async Task<UserResponse> UpdateUserAsync(string userId, UpdateUserRequest request)
@@ -195,24 +216,31 @@ public sealed class UsersService : IUsersService
 
     private static UserResponse MapUser(
         string username,
-        List<AttributeType> attributes,
+        IEnumerable<AttributeType>? attributes,
         bool? enabled,
         DateTime? createdAt,
-        string role)
+        string role,
+        string? fallbackEmail = null,
+        string? fallbackName = null)
     {
         return new UserResponse
         {
             Id = username,
-            Email = GetAttributeValue(attributes, "email") ?? string.Empty,
-            Name = GetAttributeValue(attributes, "name") ?? string.Empty,
+            Email = GetAttributeValue(attributes, "email") ?? fallbackEmail ?? string.Empty,
+            Name = GetAttributeValue(attributes, "name") ?? fallbackName ?? string.Empty,
             Role = string.IsNullOrWhiteSpace(role) ? DefaultRole : role,
             Status = enabled == true ? ActiveStatus : InactiveStatus,
             CreatedAt = createdAt ?? DateTime.UtcNow
         };
     }
 
-    private static string? GetAttributeValue(IEnumerable<AttributeType> attributes, string name)
+    private static string? GetAttributeValue(IEnumerable<AttributeType>? attributes, string name)
     {
+        if (attributes is null)
+        {
+            return null;
+        }
+
         return attributes.FirstOrDefault(attribute =>
             string.Equals(attribute.Name, name, StringComparison.OrdinalIgnoreCase))?.Value;
     }

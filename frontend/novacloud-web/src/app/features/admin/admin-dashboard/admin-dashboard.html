@@ -99,7 +99,7 @@
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          @for (log of latestLogs; track log.title) {
+          @for (log of latestRecords(); track log.title) {
             <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
               <span class="material-symbols-outlined text-3xl" [ngClass]="log.iconClass">{{ log.icon }}</span>
               <div>

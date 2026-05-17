@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavItem, StorageInfo } from '../../../../core/models/cloud-file.model';
 import { FolderModalService } from '../../../../core/services/folder-modal'; 
+import { FilesService } from '../../../../core/services/http/files.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,7 +13,10 @@ import { FolderModalService } from '../../../../core/services/folder-modal';
 })
 export class Sidebar {
   // Inyectamos el servicio para poder usarlo en este componente
-  folderModalService = inject(FolderModalService);
+  constructor(
+    public folderModalService: FolderModalService,
+    private filesService: FilesService,
+  ) {}
 
   // REGLA DE NEGOCIO: "Compartidos conmigo" eliminado del menú
   navItems: NavItem[] = [
@@ -23,10 +27,17 @@ export class Sidebar {
   ];
 
   storage: StorageInfo = {
-    usedGB: 42.5,
-    totalGB: 50,
-    percentage: 85,
+    usedGB: 0,
+    totalGB: 0,
+    percentage: 0,
   };
+
+  ngOnInit(): void {
+    this.filesService.getStorageUsage().subscribe({
+      next: (usage) => this.storage = usage,
+      error: () => this.storage = { usedGB: 0, totalGB: 0, percentage: 0 }
+    });
+  }
 
   // Método que será llamado cuando se haga clic en el botón "Nueva Carpeta"
   openNewFolderModal() {

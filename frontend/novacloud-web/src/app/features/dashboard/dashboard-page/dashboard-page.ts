@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CloudFile, CloudFolder } from '../../../core/models/cloud-file.model';
+import { forkJoin } from 'rxjs';
+import { CloudFile, CloudFolder, StorageInfo } from '../../../core/models/cloud-file.model';
 import { FileListViewComponent } from '../../../shared/components/file-list-view/file-list-view.component';
+import { FilesService } from '../../../core/services/http/files.service';
+import { FoldersService } from '../../../core/services/http/folders.service';
+import { FolderModalService } from '../../../core/services/folder-modal';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -9,65 +13,61 @@ import { FileListViewComponent } from '../../../shared/components/file-list-view
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
 })
-export class DashboardPage {
-  // ── Mock: Carpetas Generales ──
-  folders: CloudFolder[] = [
-    {
-      name: 'Documentos Personales',
-      fileCount: 45,
-      totalSize: '850 MB',
-      icon: 'folder_shared',
-      iconBgClass: 'bg-blue-50',
-      iconTextClass: 'text-blue-600',
-      avatars: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAadm_JsHxvP9_xsQXFiiaNF0Hv5gnhU-WPM-atnfOCa8x7C_Y9usJRJWqr8dekBkDPpZ01B3zbbuIW5IYBwqs7t4KcNZr3HKtEqWIu85vVtWykehMO8glqAy8g5vu5WvNxSHuoXBAqZZGuKCzzV6sMM6cn1qyocsDL_vQOIwhcJH1v5xXxCcP6XktfV49AxU2kGIRyXDef7iYMRs95FeC9QgqTuZQuqg0nFBzv-C0tqAmxLkAmjvwX-T9iXxxiD-2owx6mFg9FwcqD',
-      ],
-    },
-    {
-      name: 'Respaldos del Sistema',
-      fileCount: 12,
-      totalSize: '4.5 GB',
-      icon: 'cloud_sync',
-      iconBgClass: 'bg-purple-50',
-      iconTextClass: 'text-purple-600',
-      avatars: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuD5OCwzHUKWjO0s9yQMbBg3GbJjOdUIV7op6xp4W8EWsahhyNtgJ63mANzfQ9RwLUwjBbr2zgdz9B2jwGUNJ70ts0m7qcbx-9tjAqQjDuZ0VJfTZ7tzfcbAp1yMZ5mgu9ssiXXRFtkIt2ZuJb8DkjVIXsyH04aJWXfNwwhlL7YO60zJJBYrJP45H-ihP6bca8uPC__rdtd2pz9WN_GIBGNuO7QRqtDmrg-M5i28vDpW_2nRNAadnQ1Qv0mha637BQo09KyWUAQ1KKig',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCWUmBNxM0P8c48yu81qmo8yTSkG6j20ckw4qSfKyFlH4mPjC0JknyBGMNSz9sI3RnhbPv8SRNnHHZo2Jgre4jRXafBPBB_pAm8wBP81L9R3ORwZPw4m3rOX-vJKvwfTjdMjlh2JHAV-47oNg83Zs7pXxfKGUIRn-FBGcS2POzTff9KCqcZl_bfR5RZY0oQQ1hadez2CDA7NtWLK9d6fENFBhpdEd5zd3iV4lMyLJynXRTUmVlUuc-JGsxgZL8mBRFd0avwmzmfNG0z',
-      ],
-      extraAvatars: 1,
-    },
-    {
-      name: 'Proyectos Activos',
-      fileCount: 89,
-      totalSize: '2.1 GB',
-      icon: 'work',
-      iconBgClass: 'bg-emerald-50',
-      iconTextClass: 'text-emerald-600',
-      avatars: [
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuAdKIfDEkf-oWxjP8QH-BCbEfkS4QmeXK6pANagstFU9obv0IKbSnu8JZ05WrGEynOQLMeRKcEEeflQ5-6qBFdl4PAeZg8QPtSQtRhbszVvuxWw_iMH6SLfwwbeTvZyhe3QO4_kTrSxrEpxNdNCV9qoZ85ievH0iU1fYFsp56pCmx42_mceYcVr3K_92HyO12ic3AP8qrjt2PxQ4VofbVCWrsdNXeS_F9q-bwI_f0rt5nUxSYKl-yT9KaDH9yVZwhSHiDKZkYlZVpzp',
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuDzcvUXPeuk26id3GdChncVaUp_ggAsnyNmPeURj2nC0GySws7xMWMnETPu6HpH_RdqRfqz2nUANCzhM8qG174hWYiHr2d0KyGKAV_mX6pcvQ6CkkE4brtpJSy5av21rZl-Nfbnbz_u_N6MazUSvdTPTGWD-AW5lcD6hNQsyFrMqpX92Vk_SjUeMVPuuS77Ha3y1veCysg7seRqM305dEQ8OdJm5LAE_siwgot6kKE1EQmmI7ydg6uo-GrG_nUSglqEWppgjeWAvao2',
-      ],
-      extraAvatars: 5,
-    },
-  ];
+export class DashboardPage implements OnInit {
+  folders: CloudFolder[] = [];
+  files: CloudFile[] = [];
+  recentFiles: CloudFile[] = [];
+  starredFiles: CloudFile[] = [];
+  trashedFiles: CloudFile[] = [];
+  storageUsage: StorageInfo = { usedGB: 0, totalGB: 0, percentage: 0 };
+  isLoading = false;
+  private readonly folderModalService = inject(FolderModalService);
+  private readonly refreshFoldersEffect = effect(() => {
+    this.folderModalService.refreshTick();
+    this.loadFolders();
+  });
 
-  // ── Mock: Archivos Generales ──
-  files: CloudFile[] = [
-    { 
-      name: 'Proyecto_Estrategia_2024.pdf', 
-      size: '4.2 MB', 
-      type: 'pdf',  
-      uploadDate: new Date('2026-01-15'), 
-      timeAgo: 'Hace 3 meses', 
-      owner: 'Ana Torres', 
-      tags: ['#Confidencial', '#Borrador'],
-      aiSummary: 'Este documento detalla la hoja de ruta estratégica para el despliegue de soluciones de IA generativa en la nube. Los puntos clave incluyen: optimización de costos mediante arquitectura serverless, protocolos de seguridad de datos multi-región y un cronograma de implementación de 6 meses con hitos trimestrales.',
-      aiTags: ['#Estrategia', '#IA-Generated', '#Confidencial']
-    },
-    { name: 'Especificaciones_UI.docx', size: '1.2 MB', type: 'doc',  uploadDate: new Date('2026-02-10'), timeAgo: 'Hace 2 meses', owner: 'Luis Mendoza', tags: ['#Estrategia'] },
-    { name: 'Reporte_Anual_2025.pdf',   size: '4.8 MB', type: 'pdf',  uploadDate: new Date('2026-03-01'), timeAgo: 'Hace 1 mes', owner: 'Carlos Ruiz', tags: ['#Finanzas', '#Aprobado'] },
-    { name: 'Presupuesto_Nova.xlsx',    size: '3.1 MB', type: 'xlsx', uploadDate: new Date('2026-03-20'), timeAgo: 'Hace 3 semanas', owner: 'Ana Torres', tags: ['#Finanzas', '#Confidencial'] },
-    { name: 'Logo_AuraTech.jpg',        size: '8.2 MB', type: 'jpg',  uploadDate: new Date('2026-04-05'), timeAgo: 'Hace 2 semanas', owner: 'Marketing Team', tags: ['#Aprobado'] },
-    { name: 'Minuta_Reunion.pdf',       size: '1.5 MB', type: 'pdf',  uploadDate: new Date('2026-04-15'), timeAgo: 'Hace 6 días', owner: 'Luis Mendoza', tags: ['#Urgente'] },
-  ];
+  constructor(private filesService: FilesService, private foldersService: FoldersService) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  private loadDashboardData(): void {
+    this.isLoading = true;
+    forkJoin({
+      folders: this.foldersService.listFolders(),
+      files: this.filesService.listFiles(),
+      recentFiles: this.filesService.listFiles('recent'),
+      starredFiles: this.filesService.listFiles('starred'),
+      trashedFiles: this.filesService.listFiles('trash'),
+      storageUsage: this.filesService.getStorageUsage(),
+    }).subscribe({
+      next: (data) => {
+        this.folders = data.folders;
+        this.files = data.files;
+        this.recentFiles = data.recentFiles;
+        this.starredFiles = data.starredFiles;
+        this.trashedFiles = data.trashedFiles;
+        this.storageUsage = data.storageUsage;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.folders = [];
+        this.files = [];
+        this.recentFiles = [];
+        this.starredFiles = [];
+        this.trashedFiles = [];
+        this.storageUsage = { usedGB: 0, totalGB: 0, percentage: 0 };
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private loadFolders(): void {
+    this.foldersService.listFolders().subscribe({
+      next: (folders) => this.folders = folders,
+      error: () => this.folders = []
+    });
+  }
 }

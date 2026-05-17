@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
-import { UserService } from '../../../core/services/user.service';
+import { AdminService } from '../../../core/services/http/admin.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -16,7 +16,7 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class AdminLayout {
   private router = inject(Router);
-  private userService = inject(UserService);
+  private adminService = inject(AdminService);
 
   /** True cuando la ruta activa es /admin/users */
   readonly isUsersSection = toSignal(
@@ -28,10 +28,10 @@ export class AdminLayout {
   );
 
   get searchValue(): string {
-    return this.userService.searchQuery();
+    return this.adminService.searchQuery();
   }
 
   onSearch(value: string): void {
-    this.userService.setSearchQuery(value);
+    this.adminService.setSearchQuery(value);
   }
 }

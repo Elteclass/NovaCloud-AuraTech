@@ -11,6 +11,7 @@ export interface UserFormData {
   role: UserRole;
   status: UserStatus;
   adminPassword: string;
+  userPassword: string;
 }
 
 /** Mode: 'create' → "Crear usuario" | 'edit' → "Guardar cambios" */
@@ -43,7 +44,9 @@ export class UserFormModalComponent implements OnChanges {
   role: UserRole   = 'Visualizador';
   status: UserStatus = 'Activo';
   adminPassword = '';
+  userPassword = '';
   showPassword  = signal(false);
+  showUserPassword = signal(false);
 
   // ── Validation ─────────────────────────────────────────────────────────────
   touched = false;
@@ -74,11 +77,16 @@ export class UserFormModalComponent implements OnChanges {
     return this.touched && this.adminPassword.length < 8;
   }
 
+  get userPasswordTooShort(): boolean {
+    return this.touched && this.userPassword.length < 8;
+  }
+
   get canSubmit(): boolean {
     return (
       this.name.trim().length > 0 &&
       this.email.trim().length > 0 &&
-      this.adminPassword.length >= 8
+      this.adminPassword.length >= 8 &&
+      (this.mode === 'edit' || this.userPassword.length >= 8)
     );
   }
 
@@ -88,7 +96,9 @@ export class UserFormModalComponent implements OnChanges {
       // Reset & prefill when modal opens
       this.touched       = false;
       this.adminPassword = '';
+      this.userPassword = '';
       this.showPassword.set(false);
+      this.showUserPassword.set(false);
 
       if (this.mode === 'edit' && this.user) {
         this.name   = this.user.name;
@@ -115,6 +125,7 @@ export class UserFormModalComponent implements OnChanges {
       role: this.role,
       status: this.status,
       adminPassword: this.adminPassword,
+      userPassword: this.userPassword,
     });
   }
 
@@ -124,5 +135,9 @@ export class UserFormModalComponent implements OnChanges {
 
   togglePassword(): void {
     this.showPassword.update(v => !v);
+  }
+
+  toggleUserPassword(): void {
+    this.showUserPassword.update(v => !v);
   }
 }
